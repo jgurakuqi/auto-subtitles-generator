@@ -10,6 +10,7 @@ This project utilizes Faster Whisper to generate subtitles from audio files. It 
 * [Installation](#installation)
 * [Usage](#usage)
 * [Features](#features)
+* [Planned Improvements](#planned-improvements)
 * [Contributing](#contributing)
 * [License](#license)
 
@@ -44,19 +45,26 @@ pip install -r requirements.txt
 3. Ensure ffmpeg is installed and accessible from the command line. You can download it from [FFmpeg's official website](https://www.ffmpeg.org/download.html).
 
 ## Usage
-1. Extract audio from a video file using ffmpeg:
+
+1. Work in progress: currently the whole execution is handled through the `main.py` file. You can run it as follows:
 
 ```bash
-ffmpeg -i input_video.mp4 -q:a 0 -map a audio.wav
+python main.py
 ```
 
-2. Run the subtitle generation script:
+2. The script will use the parameters in the main to determine the audio extraction and subtitle generation process.
 
-```bash	
-python generate_subtitles.py --audio audio.wav --output subtitles.srt
-```
+3. At the end, the srt files will be generated in the same folder of the video files.
 
-3. The generated subtitles will be saved as subtitles.srt.
+# Planned Improvements:
+
+The project is quite recent, and I plan of:
+- Introducing the possiblity of chosing the parameters through command line and/or yaml file.
+- Make the code more modular.
+- Provide more user-friendly output: e.g., path of the generated subtitles, ....
+- POSSIBLY integrate Audio-tracks separator model for better audio quality. The model will entirely remove the background noise and music, leaving only the voices for the model to focus on. This, in conjunction with accurate checks over the source audio, could lead to much better subtitle quality, also allowing to disable the VAD filter (e.g., check in the voices only track if there are voices, and hence remove hallucations when no voice are detected).
+- POSSIBLE IDEA: Introduce a GUI for a more user-friendly experience.
+
 
 # Features
 - Extract audio from video files using ffmpeg.
