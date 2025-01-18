@@ -1,12 +1,13 @@
-import os
+# utils/audio_extraction.py
+
+import concurrent.futures
 import subprocess
-from concurrent.futures import ThreadPoolExecutor
 import concurrent
 from tqdm import tqdm
 
 
 def extract_audio(
-    audios_to_extract_and_video_paths: list[tuple[str, str]], force_extract: bool
+    audios_to_extract_and_video_paths: list[tuple[str, str]], force_extract: bool, num_workers: int
 ) -> None:
     """
     Extracts audio from video files using ffmpeg.
@@ -22,7 +23,7 @@ def extract_audio(
         for audio_path, video_path in audios_to_extract_and_video_paths:
             print(audio_path, "\n from video: ", video_path, "\n")
 
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
             futures = [
                 executor.submit(
                     subprocess.run,
