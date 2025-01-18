@@ -33,8 +33,8 @@ This project utilizes Faster Whisper to generate subtitles from audio files. It 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/yourprojectname.git
-cd yourprojectname
+git clone https://github.com/jgurakuqi/auto-subtitles-generator
+cd auto-subtitles-generator
 ```
 
 2. Install the required Python packages:
@@ -43,6 +43,8 @@ pip install -r requirements.txt
 ```
 
 3. Ensure ffmpeg is installed and accessible from the command line. You can download it from [FFmpeg's official website](https://www.ffmpeg.org/download.html).
+
+4. Follow the requirements for [Faster Whisper](https://github.com/SYSTRAN/faster-whisper).
 
 ## Usage
 
