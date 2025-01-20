@@ -4,3 +4,6 @@ old
 __pycache__
 full_pipeline.py
 DEBUG/*
+.vscode
+logs
+audio_output
