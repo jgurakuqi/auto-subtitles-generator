@@ -1,6 +1,7 @@
-import os
+# ./utils/utils.py
 
-# from faster_whisper import WhisperModel, BatchedInferencePipeline
+import logging, os
+from datetime import datetime
 
 video_extensions = (
     ".mp4",
@@ -15,16 +16,66 @@ video_extensions = (
 )
 
 
-def sort_key(x):
-    if "special" in x.lower():
-        return -1
-    else:
-        base_filename = os.path.basename(x)
-        return int(base_filename.lower().split("episode ")[1].split(" - ")[0])
+def initialize_logging(
+    logs_folder_path: str, log_level: int = logging.DEBUG, log_to_console: bool = True
+) -> None:
+    """Initialize logging for the application.
+
+    Args:
+        logs_folder_path (str): The path to the folder where log files will be saved.
+        log_level (int, optional): The logging level. Defaults to logging.DEBUG.
+        log_to_console (bool, optional): If True, also log to the console. Defaults to False.
+
+    Returns:
+        None
+    """
+    if not os.path.exists(logs_folder_path):
+        os.makedirs(logs_folder_path)
+
+    current_datetime = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    log_file = os.path.join(logs_folder_path, f"{current_datetime}.log")
+
+    # Create a file handler
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(log_level)
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    )
+    file_handler.setFormatter(file_formatter)
+
+    # Get the root logger
+    logger = logging.getLogger("auto-sub-gen")
+    logger.setLevel(log_level)
+    logger.addHandler(file_handler)
+
+    # Optionally add a console handler
+    if log_to_console:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(log_level)
+        console_formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+        )
+        console_handler.setFormatter(console_formatter)
+        logger.addHandler(console_handler)
+
+
+# def sort_key(x):
+#     if "special" in x.lower():
+#         return -1
+#     else:
+#         base_filename = os.path.basename(x)
+#         return int(base_filename.lower().split("episode ")[1].split(" - ")[0])
 
 
 def recursively_read_video_paths(folder_path: str) -> list[str]:
+    """Recursively read video paths from a folder.
 
+    Args:
+        folder_path (str): The path to the folder.
+
+    Returns:
+        list[str]: A list of video paths.
+    """
     return [
         os.path.join(root, file)
         for root, _, files in os.walk(folder_path)
@@ -33,28 +84,27 @@ def recursively_read_video_paths(folder_path: str) -> list[str]:
     ]
 
 
-# def load_batched_whisper(
-#     model_id: str, device: str, compute_type: str, num_workers: int
-# ) -> BatchedInferencePipeline:
-#     return BatchedInferencePipeline(
-#         WhisperModel(
-#             model_id, device=device, compute_type=compute_type, num_workers=num_workers
-#         )
-#     )
+def format_time(seconds: float) -> str:
+    """Format time in the format HH:MM:SS,SSS
 
+    Args:
+        seconds (float): Time in seconds
 
-# def load_std_whisper(
-#     model_id: str, device: str, compute_type: str, num_workers: int
-# ) -> WhisperModel:
-#     return WhisperModel(
-#         model_id, device=device, compute_type=compute_type, num_workers=num_workers
-#     )
-
-
-# # Function to convert seconds to SRT time format
-def format_time(seconds):
+    Returns:
+        str: Formatted time
+    """
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
     seconds = seconds % 60
     milliseconds = int((seconds - int(seconds)) * 1000)
     return f"{hours:02}:{minutes:02}:{int(seconds):02},{milliseconds:03}"
+
+
+def create_folder_if_not_exists(folder_path: str) -> None:
+    """Create a folder if it does not exist.
+
+    Args:
+        folder_path (str): The path to the folder.
+    """
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
