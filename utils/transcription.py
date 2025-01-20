@@ -1,5 +1,11 @@
+# ./utils/transcription.py
+
+import logging
+from logging import Logger
 from faster_whisper import WhisperModel, BatchedInferencePipeline
 from faster_whisper.transcribe import TranscriptionInfo, Segment
+
+logger = logging.getLogger("auto-sub-gen")
 
 
 def load_batched_whisper(
@@ -86,10 +92,11 @@ def transcribe_audio(
     language: str,
     use_vad_filter: bool,
     batch_size: int,
-    patience: int,
+    patience: float,
     use_word_timestamps: bool,
     vad_settings: dict | None,
     use_batched_inference: bool,
+    log_progress: bool,
 ) -> tuple[list[Segment], TranscriptionInfo]:
     """
     Transcribe audio using a Whisper model.
@@ -104,28 +111,40 @@ def transcribe_audio(
         use_word_timestamps (bool): Whether to use word timestamps.
         vad_settings (dict | None): The voice activity detection settings.
         use_batched_inference (bool): Whether to use batched inference.
+        log_progress (bool): Whether to show progress bar.
+
+    Raises:
+        Exception: If an error occurs during transcription.
 
     Returns:
         tuple[list[Segment], TranscriptionInfo]: The segments and the transcription info.
     """
-    if use_batched_inference:
-        return model.transcribe(
-            audio=input_audio_path,
-            beam_size=beam_size,
-            language=language,
-            vad_filter=use_vad_filter,
-            patience=patience,
-            batch_size=batch_size,
-            word_timestamps=use_word_timestamps,
-            vad_parameters=vad_settings,
+    try:
+        if use_batched_inference:
+            return model.transcribe(
+                audio=input_audio_path,
+                beam_size=beam_size,
+                language=language,
+                vad_filter=use_vad_filter,
+                patience=patience,
+                batch_size=batch_size,
+                word_timestamps=use_word_timestamps,
+                vad_parameters=vad_settings,
+                log_progress=log_progress,
+            )
+        else:
+            return model.transcribe(
+                audio=input_audio_path,
+                beam_size=beam_size,
+                language=language,
+                vad_filter=use_vad_filter,
+                word_timestamps=use_word_timestamps,
+                vad_parameters=vad_settings,
+                patience=patience,
+                log_progress=log_progress,
+            )
+    except Exception as e:
+        logger.error(
+            f"utils.transcription.transcribe_audio::EXCEPTION::{e}", exc_info=True
         )
-    else:
-        return model.transcribe(
-            audio=input_audio_path,
-            beam_size=beam_size,
-            language=language,
-            vad_filter=use_vad_filter,
-            word_timestamps=use_word_timestamps,
-            vad_parameters=vad_settings,
-            patience=patience,
-        )
+        raise e
