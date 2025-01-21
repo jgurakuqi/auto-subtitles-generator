@@ -1,3 +1,7 @@
 ﻿.vscode/settings.json
 *__pycache__*
 audio_output
+*vscode*
+*.wav
+*.mp4
+*.txt
