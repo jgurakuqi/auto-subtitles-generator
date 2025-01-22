@@ -5,3 +5,4 @@ audio_output
 *.wav
 *.mp4
 *.txt
+.conda

@@ -79,7 +79,7 @@ waveform = (waveform - ref.mean()) / ref.std()
 
 # Separate the sources
 sources = separate_vocals(
-    model, waveform[None], device=device, segment=11, overlap=0.25
+    model, waveform[None], device=device, segment=11, overlap=0.257
 )[0]
 # Free cuda memory
 del waveform
