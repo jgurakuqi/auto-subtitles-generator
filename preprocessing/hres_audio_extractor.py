@@ -1,7 +1,7 @@
 import subprocess
 
 
-def extract_audio(input_path: str, output_path: str):
+def extract_high_res_audio(input_path: str, output_path: str) -> None:
     subprocess.run(
         args=[
             "ffmpeg",
