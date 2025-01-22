@@ -3,12 +3,17 @@
 # Std library imports
 import gc
 import logging, torch, os
+from typing import Iterable
 
 # Local repository imports
 from utils.audio_extraction import extract_audio
 from utils.transcription import load_model, transcribe_audio
 from utils.srt_generation import generate_srt
-from utils.utils import recursively_read_video_paths, initialize_logging
+from utils.utils import (
+    recursively_read_video_paths,
+    initialize_logging,
+    create_folder_if_not_exists,
+)
 
 from preprocessing.vocals_separator import (
     save_vocals,
@@ -27,7 +32,10 @@ logger = logging.getLogger("auto-sub-gen")
 
 
 def extract_vocals_only_audio(
-    input_audio_paths: list[str], segment: int = 11, overlap: float = 0.257
+    input_audio_paths: list[str],
+    segment: int = 11,
+    overlap: float = 0.257,
+    vocals_only_folder: str = "./vocals_only",
 ):
     """Extract vocals only audio from the input audio files.
 
@@ -35,6 +43,7 @@ def extract_vocals_only_audio(
         input_audio_paths (list[str]): List of input audio file paths.
         segment (int, optional): Segment length in seconds. Defaults to 11.
         overlap (float, optional): Overlap between segments. Defaults to 0.257.
+        vocals_only_folder (str, optional): Output folder for vocals only audio. Defaults to "./vocals_only".
 
     Returns:
         None
@@ -42,8 +51,14 @@ def extract_vocals_only_audio(
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model, sample_rate = load_vocals_model(device)
 
+    create_folder_if_not_exists(vocals_only_folder)
+
     for input_path in input_audio_paths:
-        output_audio_path = os.path.splitext(input_path)[0] + "_vocals_only.wav"
+        # create the path as folder + basefilename + _vocals.wav
+        output_audio_path = os.path.join(
+            vocals_only_folder,
+            os.path.splitext(os.path.basename(input_path))[0] + "_vocals.wav",
+        )
         waveform, ref = load_audio(input_path, device)
 
         sources = separate_vocals(
@@ -158,7 +173,7 @@ def main():
     for audio_path in all_audio_paths:
         logger.debug(f"Fetchable audio: {audio_path}...")
 
-    segments: list[Segment]
+    segments: Iterable[Segment]
     info: TranscriptionInfo
     for audio_path in all_audio_paths:
         try:

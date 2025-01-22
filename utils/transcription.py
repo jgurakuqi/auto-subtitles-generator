@@ -2,6 +2,7 @@
 
 import logging
 from logging import Logger
+from typing import Iterable, cast
 from faster_whisper import WhisperModel, BatchedInferencePipeline
 from faster_whisper.transcribe import TranscriptionInfo, Segment
 
@@ -97,7 +98,7 @@ def transcribe_audio(
     vad_settings: dict | None,
     use_batched_inference: bool,
     log_progress: bool,
-) -> tuple[list[Segment], TranscriptionInfo]:
+) -> tuple[Iterable[Segment], TranscriptionInfo]:
     """
     Transcribe audio using a Whisper model.
 
@@ -121,7 +122,8 @@ def transcribe_audio(
     """
     try:
         if use_batched_inference:
-            return model.transcribe(
+
+            return cast(BatchedInferencePipeline, model).transcribe(
                 audio=input_audio_path,
                 beam_size=beam_size,
                 language=language,

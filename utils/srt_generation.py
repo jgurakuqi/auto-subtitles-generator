@@ -2,6 +2,7 @@
 
 import logging
 import os
+from typing import Iterable
 from faster_whisper.transcribe import Segment, Word
 from utils.utils import format_time
 
@@ -18,7 +19,7 @@ def adjust_outlier_times(words: list[Word]) -> list[Word]:
 
 
 def generate_srt(
-    segments: list[Segment],
+    segments: Iterable[Segment],
     audio_path: str,
     max_chars: int,
     srt_debug_mode: bool,
@@ -40,7 +41,7 @@ def generate_srt(
     srt_filename = os.path.splitext(audio_path)[0] + ".srt"
     with open(srt_filename, "w") as srt_file:
         index = 1
-        words: list[Word]
+        words: list[Word] | None
         word: Word
 
         if srt_debug_mode:
@@ -51,6 +52,13 @@ def generate_srt(
 
         for segment in segments:
             words = segment.words
+
+            if words is None or len(words) == 0:
+                logger.warning(
+                    f"No words found in segment {segment.start} to {segment.end}"
+                )
+                continue
+
             current_text = ""
             start_time = None
 
@@ -91,6 +99,6 @@ def generate_srt(
             if current_text:
                 end_time = words[-1].end
                 srt_file.write(
-                    f"{index}\n{format_time(start_time)} --> {format_time(end_time)}\n{current_text.strip()}\n\n"
+                    f"{index}\n{format_time(start_time)} --> {format_time(end_time)}\n{current_text.strip()}\n\n"  # type: ignore
                 )
                 index += 1
