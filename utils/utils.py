@@ -16,6 +16,28 @@ video_extensions = (
 )
 
 
+def build_path(
+    folder_path: str, file_rel_path: str, extension_replacement: str | None = None
+) -> str:
+    """Build a path by joining the folder path and the relative path with an optional extension replacement.
+
+    Args:
+        folder_path (str): The folder path.
+        file_rel_path (str): The relative path of the file.
+        extension_replacement (str, optional): The replacement extension. Defaults to None.
+
+    Returns:
+        str: The built path.
+    """
+    if extension_replacement is not None:
+        built_path = os.path.join(
+            folder_path, os.path.splitext(file_rel_path)[0] + extension_replacement
+        )
+    else:
+        built_path = os.path.join(folder_path, file_rel_path)
+    return built_path
+
+
 def initialize_logging(
     logs_folder_path: str, log_level: int = logging.DEBUG, log_to_console: bool = True
 ) -> None:
