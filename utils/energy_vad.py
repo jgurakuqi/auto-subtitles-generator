@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import cast
 import librosa
 import numpy as np
-from utils.utils import create_folder_if_not_exists
+from utils.utils import create_folder_if_not_exists, build_path
 
 import logging
 
@@ -243,12 +243,11 @@ def perform_energy_vad(
     hop_length: int = 126,
     energy_threshold: float = 0.1,
     seconds_per_chunk: int = 2000,  # ~30 minutes
+    timestamps_folder: str = "./timestamps/",
 ):
     # audio_path = "./vocals_only.wav"
 
     logger.debug(f"utils.energy_vad.perform_energy_vad:: Audio path: {audio_path}")
-
-    time0 = datetime.now()
 
     y: np.ndarray
     sr: int
@@ -278,10 +277,15 @@ def perform_energy_vad(
     )
     new_timestamps = merge_contiguous_timestamps(timestamps=timestamps)
 
-    timestamps_folder = "./timestamps/"
     create_folder_if_not_exists(folder_path=timestamps_folder)
+
+    timestap_full_path = build_path(
+        folder_path=timestamps_folder,
+        file_path=audio_path,
+        extension_replacement="_timestamps.json",
+    )
 
     save_timestamps_as_json(
         timestamps=new_timestamps,
-        file_path=os.path.join(timestamps_folder, "vad_timestamps.json"),
+        file_path=timestap_full_path,
     )

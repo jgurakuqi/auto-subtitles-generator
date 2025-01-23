@@ -17,24 +17,31 @@ video_extensions = (
 
 
 def build_path(
-    folder_path: str, file_rel_path: str, extension_replacement: str | None = None
+    folder_path: str, file_path: str, extension_replacement: str | None = None
 ) -> str:
     """Build a path by joining the folder path and the relative path with an optional extension replacement.
 
     Args:
         folder_path (str): The folder path.
-        file_rel_path (str): The relative path of the file.
-        extension_replacement (str, optional): The replacement extension. Defaults to None.
+        file_path (str): The path of the file.
+        extension_replacement (str, optional): The replacement extension. Must include the dot. Defaults to None.
 
     Returns:
         str: The built path.
     """
+    # if extension_replacement is not None: --> path = folder_path + base_filename + extension_replacement
+
     if extension_replacement is not None:
+        if "." not in extension_replacement:
+            raise ValueError("extension_replacement must include the dot.")
         built_path = os.path.join(
-            folder_path, os.path.splitext(file_rel_path)[0] + extension_replacement
+            folder_path,
+            os.path.basename(file_path).replace(
+                os.path.splitext(file_path)[-1], extension_replacement
+            ),
         )
     else:
-        built_path = os.path.join(folder_path, file_rel_path)
+        built_path = os.path.join(folder_path, os.path.basename(file_path))
     return built_path
 
 
