@@ -2,9 +2,10 @@
 
 import logging
 from logging import Logger
-from typing import Iterable, cast
+from typing import BinaryIO, Iterable, cast
 from faster_whisper import WhisperModel, BatchedInferencePipeline
 from faster_whisper.transcribe import TranscriptionInfo, Segment
+import numpy as np
 
 logger = logging.getLogger("auto-sub-gen")
 
@@ -88,7 +89,7 @@ def load_model(
 
 def transcribe_audio(
     model: WhisperModel | BatchedInferencePipeline,
-    input_audio_path: str,
+    audio: str | BinaryIO | np.ndarray,
     beam_size: int,
     language: str,
     use_vad_filter: bool,
@@ -104,7 +105,7 @@ def transcribe_audio(
 
     Args:
         model (WhisperModel | BatchedInferencePipeline): The Whisper model to use for transcription.
-        input_audio_path (str): The path to the input audio file.
+        audio (str | BinaryIO | np.ndarray): The audio data to transcribe. Can be a path to a file, a file-like object, or a numpy array.
         beam_size (int): The beam size to use for transcription.
         language (str): The language to use for transcription.
         use_vad_filter (bool): Whether to use voice activity detection.
@@ -124,7 +125,7 @@ def transcribe_audio(
         if use_batched_inference:
 
             return cast(BatchedInferencePipeline, model).transcribe(
-                audio=input_audio_path,
+                audio=audio,
                 beam_size=beam_size,
                 language=language,
                 vad_filter=use_vad_filter,
@@ -136,7 +137,7 @@ def transcribe_audio(
             )
         else:
             return model.transcribe(
-                audio=input_audio_path,
+                audio=audio,
                 beam_size=beam_size,
                 language=language,
                 vad_filter=use_vad_filter,
