@@ -30,6 +30,10 @@ initialize_logging(
 )
 logger = logging.getLogger("auto-sub-gen")
 
+import json
+import numpy as np
+from typing import List, Tuple
+
 
 def extract_vocals_only_audio(
     input_audio_paths: list[str],
@@ -180,7 +184,7 @@ def main():
             logger.info(f"Transcribing {audio_path}...")
             segments, info = transcribe_audio(
                 model=model,
-                input_audio_path=audio_path,
+                audio=audio_path,
                 beam_size=BEAM_SIZE,
                 language=LANGUAGE,
                 use_vad_filter=USE_VAD_FILTER,
