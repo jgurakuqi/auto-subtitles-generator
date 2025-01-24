@@ -8,6 +8,10 @@ from tqdm import tqdm
 
 from utils.utils import create_folder_if_not_exists, build_path
 
+import logging
+
+logger = logging.getLogger("auto-sub-gen")
+
 
 def load_vocals_model(device: torch.device) -> tuple[torch.nn.Module, int]:
     """Load the pre-trained HDEMUCS_HIGH_MUSDB_PLUS model.
@@ -18,6 +22,9 @@ def load_vocals_model(device: torch.device) -> tuple[torch.nn.Module, int]:
     Returns:
         tuple[torch.nn.Module, int]: The model and the sample rate.
     """
+    logger.debug(
+        f"utils.vocals_separator.load_vocals_model:: Loading model on: {device}"
+    )
     bundle = HDEMUCS_HIGH_MUSDB_PLUS
     model = bundle.get_model()
     model.to(device)
@@ -36,6 +43,9 @@ def load_audio(
     Returns:
         tuple[torch.Tensor, torch.Tensor]: The audio waveform and the reference signal.
     """
+    logger.debug(
+        f"utils.vocals_separator.load_audio:: Loading audio: {file_path} on {device}"
+    )
     waveform, _ = torchaudio.load(file_path)
     waveform = waveform.to(device)
     if waveform.shape[0] == 1:
@@ -50,8 +60,8 @@ def load_audio(
 def separate_vocals(
     model: torch.nn.Module,
     mix: torch.Tensor,
-    segment: float = 10.0,
-    overlap: float = 0.1,
+    segment: float,
+    overlap: float,
     device: torch.device | None = None,
     sample_rate: int = 44100,
 ) -> torch.Tensor:
@@ -60,8 +70,8 @@ def separate_vocals(
     Args:
         model (torch.nn.Module): The model to use for separation.
         mix (torch.Tensor): The mixed audio signal.
-        segment (float, optional): The segment length in seconds. Defaults to 10.0.
-        overlap (float, optional): The overlap between segments in seconds. Defaults to 0.1.
+        segment (float, optional): The segment length in seconds.
+        overlap (float, optional): The overlap between segments in seconds.
         device (torch.device | None, optional): The device to use for processing. Defaults to None.
         sample_rate (int, optional): The sample rate of the audio. Defaults to 44100.
 
@@ -148,13 +158,9 @@ def extract_vocals_only_audio(
     create_folder_if_not_exists(vocals_only_folder)
 
     for input_path in input_audio_paths:
-        # output_audio_path = os.path.join(
-        #     vocals_only_folder,
-        #     os.path.splitext(os.path.basename(input_path))[0] + "_vocals.wav",
-        # )
         output_audio_path = build_path(
             folder_path=vocals_only_folder,
-            file_rel_path=input_path,
+            file_path=input_path,
             extension_replacement="_vocals.wav",
         )
         waveform, ref = load_audio(input_path, device)

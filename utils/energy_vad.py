@@ -26,6 +26,20 @@ def load_audio(
     return librosa.load(audio_path, sr=sample_rate)
 
 
+def load_vad_timestamps(vad_json_path: str) -> list[tuple[float, float]]:
+    """Load VAD timestamps from a JSON file.
+
+    Args:
+        vad_json_path (str): Path to the VAD JSON file.
+
+    Returns:
+        list[tuple[float, float]]: List of tuples (start, end) for each segment.
+    """
+    with open(vad_json_path, "r") as file:
+        vad_data = json.load(file)
+    return [(segment["start"], segment["end"]) for segment in vad_data]
+
+
 def calculate_energy_in_chunks(
     y: np.ndarray,
     frame_length: int,
@@ -49,7 +63,6 @@ def calculate_energy_in_chunks(
 
     chunk_size = int(seconds_per_chunk * sample_rate)
 
-    print("Selected chunk size: ", chunk_size)
     num_chunks = len(y) // chunk_size + (1 if len(y) % chunk_size != 0 else 0)
 
     for i in range(num_chunks):
@@ -72,35 +85,23 @@ def calculate_energy_in_chunks(
     return energy / np.max(energy)
 
 
-def calculate_energy(y: np.ndarray, frame_length: int, hop_length: int) -> np.ndarray:
-    """Calculate short-time energy using vectorized operations.
+# More accurate, but takes to much RAM with long videos. E.g., ~13 gb for a 90 minutes video with 44.1kHz
+# def calculate_energy(y: np.ndarray, frame_length: int, hop_length: int) -> np.ndarray:
+#     """Calculate short-time energy using vectorized operations.
 
-    Args:
-        y (np.ndarray): Audio data.
-        frame_length (int): Frame length.
-        hop_length (int): Hop length.
+#     Args:
+#         y (np.ndarray): Audio data.
+#         frame_length (int): Frame length.
+#         hop_length (int): Hop length.
 
-    Returns:
-        np.ndarray: Short-time energy.
-    """
-    print(
-        "Ram Usage INSIDE calculate_energy 1: ",
-        os.popen("free -m").readlines()[1].split()[2],
-    )
-    energy = (
-        np.lib.stride_tricks.sliding_window_view(y, frame_length)[::hop_length] ** 2
-    )
-
-    print(
-        "Ram Usage INSIDE calculate_energy 2: ",
-        os.popen("free -m").readlines()[1].split()[2],
-    )
-    energy = np.sum(energy, axis=1)
-    print(
-        "Ram Usage INSIDE calculate_energy 3: ",
-        os.popen("free -m").readlines()[1].split()[2],
-    )
-    return energy / np.max(energy)
+#     Returns:
+#         np.ndarray: Short-time energy.
+#     """
+#     energy = (
+#         np.lib.stride_tricks.sliding_window_view(y, frame_length)[::hop_length] ** 2
+#     )
+#     energy = np.sum(energy, axis=1)
+#     return energy / np.max(energy)
 
 
 def detect_voice_activity(energy: np.ndarray, energy_threshold: float) -> np.ndarray:

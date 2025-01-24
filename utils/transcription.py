@@ -6,6 +6,7 @@ from typing import BinaryIO, Iterable, cast
 from faster_whisper import WhisperModel, BatchedInferencePipeline
 from faster_whisper.transcribe import TranscriptionInfo, Segment
 import numpy as np
+from tqdm import tqdm
 
 logger = logging.getLogger("auto-sub-gen")
 
@@ -151,3 +152,95 @@ def transcribe_audio(
             f"utils.transcription.transcribe_audio::EXCEPTION::{e}", exc_info=True
         )
         raise e
+
+
+def slice_audio(
+    audio_waveform: np.ndarray, sample_rate: int, timestamps: list[tuple[float, float]]
+) -> list[np.ndarray]:
+    """Slice audio waveform into segments based on timestamps.
+
+    Args:
+        audio_waveform (np.ndarray): The audio waveform.
+        sample_rate (int): The sample rate of the audio.
+        timestamps (list[tuple[float, float]]): The timestamps of the segments.
+
+    Returns:
+        list[np.ndarray]: The segments of the audio waveform.
+    """
+    segments = []
+    for start, end in timestamps:
+        start_sample = int(start * sample_rate)
+        end_sample = int(end * sample_rate)
+        segments.append(audio_waveform[start_sample:end_sample])
+    return segments
+
+
+def transcribe_speech_segments(
+    model: BatchedInferencePipeline | WhisperModel,
+    audio_waveform: np.ndarray,
+    sample_rate: int,
+    vad_timestamps: list[tuple[float, float]],
+    beam_size: int,
+    language: str,
+    use_vad_filter: bool,
+    patience: float,
+    use_word_timestamps: bool,
+    vad_settings: dict | None,
+    log_progress: bool,
+    use_batched_inference: bool,
+    batch_size: int,
+):
+    """Transcribe only the speech segments.
+
+    Args:
+        model (BatchedInferencePipeline | WhisperModel): The Whisper model.
+        audio_waveform (np.ndarray): The audio waveform.
+        sample_rate (int): The sample rate of the audio.
+        vad_timestamps (List[Tuple[float, float]]): The VAD timestamps.
+        beam_size (int): The beam size for the transcriptions.
+        language (str): The language for the transcriptions.
+        use_vad_filter (bool): Whether to use the VAD filter.
+        patience (float): The patience for the transcriptions.
+        use_word_timestamps (bool): Whether to use word timestamps.
+        vad_settings (dict | None): The VAD settings.
+        log_progress (bool): Whether to show progress bar.
+        use_batched_inference (bool): Whether to use batched inference.
+        batch_size (int): The batch size for the transcriptions. Useful for batched inference.
+
+    Returns:
+        tuple[List[Segment], List[TranscriptionInfo]]: The transcribed segments and their info.
+    """
+    speech_segments = slice_audio(audio_waveform, sample_rate, vad_timestamps)
+    all_segments = []
+    all_info = []
+
+    segments: Iterable[Segment]
+    info: TranscriptionInfo
+    speech_segment: np.ndarray
+
+    for speech_segment in tqdm(
+        speech_segments,
+        total=len(speech_segments),
+        desc="Transcribing speech segments: ",
+    ):
+
+        segments, info = transcribe_audio(
+            model=model,
+            audio=speech_segment,
+            beam_size=beam_size,
+            language=language,
+            use_vad_filter=use_vad_filter,
+            batch_size=batch_size,
+            patience=patience,
+            use_word_timestamps=use_word_timestamps,
+            vad_settings=vad_settings,
+            use_batched_inference=use_batched_inference,
+            log_progress=log_progress,
+        )
+
+        for segment in segments:
+            all_segments.append(segment)
+
+        all_info.append(info)
+
+    return all_segments, all_info

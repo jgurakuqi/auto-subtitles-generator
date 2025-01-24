@@ -3,6 +3,9 @@
 import logging, os
 from datetime import datetime
 
+logger = logging.getLogger("auto-sub-gen")
+
+
 video_extensions = (
     ".mp4",
     ".avi",

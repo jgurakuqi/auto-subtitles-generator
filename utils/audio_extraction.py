@@ -29,7 +29,6 @@ def extract_audio(
     Returns:
         None
     """
-    output_paths = []
     if len(audio_extraction_paths) > 0 or force_extract:
         logger.info("Starting audio extraction from video files...")
         for video_path in audio_extraction_paths:
@@ -58,7 +57,7 @@ def extract_audio(
                 desc="Extracting audio:...",
             ):
                 try:
-                    output_paths.append(future.result())
+                    future.result()
                 except Exception as e:
                     failures += 1
                     failed_paths.append(str(e))
@@ -77,14 +76,12 @@ def extract_audio(
     else:
         logger.info("No files to extract audio from.")
 
-    return output_paths
-
 
 def run_subprocess(
     video_path: str,
     atomic_operation: bool,
     audio_output_folder: str,
-) -> str:
+) -> None:
     """
     Runs the ffmpeg command to extract audio from a video file.
 
@@ -97,7 +94,7 @@ def run_subprocess(
         RuntimeError: Thrown if the ffmpeg command fails.
 
     Returns:
-        str: The used path.
+        None
     """
     try:
         # Paths is = audio_output_folder + original video name + .wav
@@ -131,7 +128,6 @@ def run_subprocess(
             ],
             check=True,
         )
-        return output_path
     except subprocess.CalledProcessError as e:
         error_message = f"Failed to extract audio from {video_path}: {e}"
         logger.error(error_message)
