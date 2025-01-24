@@ -113,8 +113,10 @@
 # print(f"Difference: {int(minutes):02d}:{int(seconds):02d}")
 
 
+import json
 import os
 from datetime import datetime
+from typing import cast
 import librosa
 import numpy as np
 from utils.utils import create_folder_if_not_exists
@@ -122,7 +124,7 @@ from utils.utils import create_folder_if_not_exists
 
 def load_audio(
     audio_path: str, sample_rate: int | None = None
-) -> tuple[np.ndarray, int]:
+) -> tuple[np.ndarray, int | float]:
     """Load the audio file.
 
     Args:
@@ -133,43 +135,6 @@ def load_audio(
         tuple[np.ndarray, int]: Audio data and sample rate.
     """
     return librosa.load(audio_path, sr=sample_rate)
-
-
-def calculate_energy(
-    y: np.ndarray, frame_length: int, hop_length: int, chunk_size: int
-) -> np.ndarray:
-    """Calculate short-time energy using chunk processing.
-
-    Args:
-        y (np.ndarray): Audio data.
-        frame_length (int): Frame length.
-        hop_length (int): Hop length.
-        chunk_size (int): Size of each chunk to process.
-
-    Returns:
-        np.ndarray: Short-time energy.
-    """
-    energy = []
-    num_chunks = len(y) // chunk_size + (1 if len(y) % chunk_size != 0 else 0)
-
-    for i in range(num_chunks):
-        start = i * chunk_size
-        end = min((i + 1) * chunk_size + frame_length, len(y))
-        chunk = y[start:end]
-
-        # Calculate energy for the current chunk
-        chunk_energy = (
-            np.lib.stride_tricks.sliding_window_view(chunk, frame_length)[::hop_length]
-            ** 2
-        )
-        chunk_energy = np.sum(chunk_energy, axis=1)
-        energy.append(chunk_energy)
-
-    # Concatenate all chunk energies
-    energy = np.concatenate(energy)
-
-    # Normalize energy
-    return energy / np.max(energy)
 
 
 def calculate_energy_in_chunks(
@@ -329,7 +294,7 @@ def save_timestamps(
     timestamps: list[dict[str, float]],
     hop_duration: float,
     file_path: str,
-    energy: np.ndarray = None,
+    energy: np.ndarray | None = None,
 ) -> None:
     """Save timestamps to a file.
 
@@ -352,6 +317,7 @@ def save_timestamps(
                     if start_frame < end_frame
                     else 0
                 )
+
                 file.write(
                     f"{format_timestamps(timestamp)} - Energy: {avg_energy:.4f}\n"
                 )
@@ -359,48 +325,27 @@ def save_timestamps(
                 file.write(f"{format_timestamps(timestamp)}\n")
 
 
-# def get_available_ram():
-#     """Get available RAM in GB."""
-#     mem_info = os.popen("free -b").readlines()[1].split()
-#     available_ram = int(mem_info[6])  # Available RAM in bytes
-#     return available_ram / (1_073_741_824)  # = 1024 * 1024 * 1024
-
-
-# def find_max_seconds_per_chunk(
-#     max_free_memory_ratio: float = 0.8,
-#     seconds_per_chunk: int = 60,
-#     chunk_overlap_ratio: float = 0.75,
-# ):
-#     """Find the maximum seconds per chunk based on available RAM.
-
-#     Args:
-#         max_free_memory_ratio (float, optional): Maximum free memory ratio. Defaults to 0.8.
-#         seconds_per_chunk (int, optional): Initial seconds per chunk. Defaults to 60 seconds. ~0.25gb used per 60 seconds.
-#         chunk_overlap_ratio (float, optional): Chunk's ratio used for left and right overlap (i.e., total memory
-#             will be chunk_size + (chunk_size * chunk_overlap_ratio * 2)). Defaults to 0.75.
-
-#     Returns:
-#         int: Maximum seconds per chunk.
-#     """
-#     # ~0.25gb used per 60 seconds.
-#     used_gb = seconds_per_chunk / 60 * 0.25
-#     available_ram = get_available_ram() * max_free_memory_ratio
-#     total_chunk_overlap_ratio = chunk_overlap_ratio * 2 + 1
-#     while True:
-#         if (used_gb * 2) * total_chunk_overlap_ratio < available_ram:
-#             seconds_per_chunk *= 2
-#             used_gb *= 2
-#         elif (used_gb * 1.5) * total_chunk_overlap_ratio < available_ram:
-#             seconds_per_chunk *= 1.5
-#             used_gb *= 1.5
-#         elif (used_gb * 1.25) * total_chunk_overlap_ratio < available_ram:
-#             seconds_per_chunk *= 1.25
-#             used_gb *= 1.25
-#         elif (used_gb * 1.1) * total_chunk_overlap_ratio < available_ram:
-#             seconds_per_chunk *= 1.1
-#             used_gb *= 1.1
-#         else:
-#             return seconds_per_chunk
+def save_timestamps_as_json(
+    timestamps: list[dict[str, float]],
+    file_path: str,
+    energy: np.ndarray | None = None,
+    hop_duration: float | None = None,
+) -> None:
+    if energy is not None and hop_duration is not None:
+        with open(file_path, "w") as file:
+            for i, timestamp in enumerate(timestamps):
+                start_frame = int(timestamp["start"] / hop_duration)
+                end_frame = int(timestamp["end"] / hop_duration)
+                avg_energy = (
+                    np.mean(energy[start_frame:end_frame])
+                    if start_frame < end_frame
+                    else 0
+                )
+                timestamp["energy"] = float(avg_energy)
+                file.write(json.dumps(timestamp) + "\n")
+    else:
+        with open(file_path, "w") as file:
+            json.dump(timestamps, file, indent=4)
 
 
 def main():
@@ -411,9 +356,11 @@ def main():
 
     print(f"Audio path: {audio_path}")
 
+    time0 = datetime.now()
+
     y: np.ndarray
     sr: int
-    y, sr = load_audio(audio_path)
+    y, sr = cast(tuple[np.ndarray, int], load_audio(audio_path))
     y_len = len(y)
     hop_duration = hop_length / sr
 
@@ -444,23 +391,33 @@ def main():
 
     timestamps_folder = "./timestamps/"
     create_folder_if_not_exists(folder_path=timestamps_folder)
-    save_timestamps(
+    # save_timestamps(
+    #     timestamps=new_timestamps,
+    #     file_path=os.path.join(timestamps_folder, "energy_concat.txt"),
+    #     hop_duration=hop_duration,
+    #     energy=None,
+    # )
+    # save_timestamps(
+    #     timestamps=timestamps,
+    #     file_path=os.path.join(timestamps_folder, "energy.txt"),
+    #     hop_duration=hop_duration,
+    #     energy=energy,
+    # )
+    save_timestamps_as_json(
         timestamps=new_timestamps,
-        file_path=os.path.join(timestamps_folder, "energy_concat.txt"),
-        hop_duration=hop_duration,
-        energy=None,
-    )
-    save_timestamps(
-        timestamps=timestamps,
-        file_path=os.path.join(timestamps_folder, "energy.txt"),
-        hop_duration=hop_duration,
-        energy=energy,
+        file_path=os.path.join(timestamps_folder, "vad_timestamps.json"),
     )
 
     time2 = datetime.now()
     time_difference = (time2 - time1).total_seconds()
     minutes, seconds = divmod(abs(time_difference), 60)
-    print(f"Difference: {int(minutes):02d}:{int(seconds):02d}")
+    print(f"Ealpsed processing: {int(minutes):02d}:{int(seconds):02d}")
+
+    time_difference = (time2 - time0).total_seconds()
+    minutes, seconds = divmod(abs(time_difference), 60)
+    print(
+        f"Elapsed processing with Audio Loading: {int(minutes):02d}:{int(seconds):02d}"
+    )
 
 
 if __name__ == "__main__":

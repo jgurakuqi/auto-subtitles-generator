@@ -22,7 +22,9 @@ def load_vocals_model(device: torch.device) -> tuple[torch.nn.Module, int]:
     return model, bundle.sample_rate
 
 
-def load_audio(file_path: str, device: torch.device) -> torch.Tensor:
+def load_audio(
+    file_path: str, device: torch.device
+) -> tuple[torch.Tensor, torch.Tensor]:
     """Load and normalize the audio file.
 
     Args:
@@ -30,7 +32,7 @@ def load_audio(file_path: str, device: torch.device) -> torch.Tensor:
         device (torch.device): The device to use for processing.
 
     Returns:
-        torch.Tensor: The normalized audio signal.
+        tuple[torch.Tensor, torch.Tensor]: The audio waveform and the reference signal.
     """
     waveform, _ = torchaudio.load(file_path)
     waveform = waveform.to(device)
