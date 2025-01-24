@@ -1,0 +1,37 @@
+paths:
+  videos_folder: "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/2_Chunin Exams/"
+  vocals_only_folder : "./vocals_only/"
+
+vocal_separator_model:
+  use_half_precision: true # tells Demucs to use half precision float16.
+  # device: "cuda" # This will be dynamically determined in code if not enabled here.
+  sample_rate: 44100 # best for Hybrid Demucs
+  segment: 11.0 # in seconds: determines the length of each chunk. Higher --> Faster and better quality, but requires more VRAM/RAM.
+  overlap: 0.257 # in seconds: determines the overlap between chunks. Higher --> Faster and better quality, but requires more VRAM/RAM.
+
+
+transcriber_model:
+  model_id: "deepdml/faster-whisper-large-v3-turbo-ct2"
+  # device: "cuda" # This will be dynamically determined in code if not enabled here.
+  compute_type: "float16"
+  beam_size: 8
+  patience: 1.25
+  language: "en"
+  log_progress: true
+  use_word_timestamps: true
+  use_batched_inference: false
+  batched_inference_params:
+    batch_size: 22
+    num_workers: 1
+
+vad:
+  use_vad_filter: false
+  settings: null # Using Demucs+Custom VAD instead --> otherwise set use_vad_filter to True and initize VAD settings as indicated on Faster Whisper repo
+
+transcription:
+  max_chars: 60
+  debug_mode: true
+
+audio_extraction:
+  force_extract: false # Set to true if you want to force the extraction of audio even if it already exists
+  ffmpeg_threads: 6 # how many audios to extract at the same time.
