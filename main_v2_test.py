@@ -6,7 +6,7 @@ import librosa
 
 # Local repository imports
 from utils.audio_extraction import extract_audio
-from utils.transcription import load_model
+from utils.transcription import load_model, transcribe_speech_segments
 from utils.srt_generation import generate_srt
 from utils.utils import (
     recursively_read_video_paths,
@@ -14,6 +14,8 @@ from utils.utils import (
 )
 from utils.vocals_separator import extract_vocals_only_audio, load_audio
 from utils.energy_vad import perform_energy_vad, load_vad_timestamps
+from pipeline_config.pipeline_config import PipelineConfig
+
 
 # Third-party library imports
 from faster_whisper.transcribe import Segment, TranscriptionInfo
@@ -24,109 +26,120 @@ initialize_logging(
 logger = logging.getLogger("auto-sub-gen")
 
 
-import torch
-
-
-# Yaml content:
-# paths:
-#   videos_folder: "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/2_Chunin Exams/"
-#   vocals_only_folder : "./vocals_only/"
-
-# model:
-#   use_batched_inference: false
-#   model_id: "deepdml/faster-whisper-large-v3-turbo-ct2"
-#   # device: "cuda" # This will be dynamically determined in code if not enabled here.
-#   compute_type: "float16"
-#   beam_size: 8
-#   patience: 1.25
-#   language: "en"
-#   log_progress: true
-#   use_word_timestamps: true
-#   batched_inference_params:
-#     batch_size: 22
-#     num_workers: 1
-
-# vad:
-#   use_vad_filter: false
-#   settings: null # Using Demucs+Custom VAD instead --> otherwise set use_vad_filter to True and initize VAD settings as indicated on Faster Whisper repo
-
-# transcription:
-#   max_chars: 60
-#   atomic_transcription: false
-
-# srt:
-#   debug_mode: true
-
-# audio_extraction:
-#   force_extract: false
-#   atomic_extraction: true
-#   ffmpeg_threads: 6
-
-
 def main():
-    config_path = "./config.yaml"
-    config = load_config(config_path)
-    video_folder = config["paths"]["videos_folder"]
-    vocals_only_folder = config["paths"]["vocals_only_folder"]
+    pipeline_config = PipelineConfig(config_path="./config.yaml")
 
-    orig_video_paths = recursively_read_video_paths(FOLDER_VIDEOS_PATH)
+    orig_video_paths = recursively_read_video_paths(pipeline_config.paths.videos_folder)
 
-    logger.debug(f"Found video_paths:\n")
-    for video_path in orig_video_paths:
-        logger.debug(f"{video_path}\n")
+    # 1. Extract vocals only audios
+    # 2. Apply custom VAD on vocals only audios
+    # 3. Transcribe vocals only audios
+    # 4. Generate SRT files
 
-    video_paths_to_extract = [
+    sources_to_split = [
         video_path
         for video_path in orig_video_paths
-        if FORCE_EXTRACT
-        or not os.path.exists(
+        if not os.path.exists(
             os.path.join(
-                AUDIO_FOLDER,
+                pipeline_config.paths.vocals_only_folder,
                 os.path.basename(video_path).replace(
-                    os.path.splitext(video_path)[-1], ".wav"
+                    os.path.splitext(video_path)[-1], "_vocals.wav"
                 ),
             )
         )
     ]
 
-    extract_audio(
-        audio_extraction_paths=video_paths_to_extract,
-        force_extract=FORCE_EXTRACT,
-        num_workers=FFMPEG_THREADS_NUM,
-        atomic_operation=ATOMIC_AUDIO_EXTRACTION,
-        audio_output_folder=AUDIO_FOLDER,
+    logger.info(f"Sources to extract vocals from: {len(sources_to_split)}")
+
+    extract_vocals_only_audio(
+        input_audio_paths=sources_to_split,
+        # segment=pipeline_config..segment,
+        # overlap=pipeline_config.vad.overlap,
+        vocals_only_folder=pipeline_config.paths.vocals_only_folder,
     )
 
-    logger.info(f"Loading model...")
+    # get all file paths in the folder of vocals only audios
+    vocals_only_audio_paths = [
+        os.path.join(pipeline_config.paths.vocals_only_folder, file_path)
+        for file_path in os.listdir(pipeline_config.paths.vocals_only_folder)
+    ]
+
+    # 1. Extract vocals only audios
+    # 2. Apply custom VAD on vocals only audios
+    # 3. Transcribe vocals only audios
+    # 4. Generate SRT files
+
+    sources_for_timestamps = []
+    for audio_path in vocals_only_audio_paths:
+        timestamp_path = os.path.join(
+            pipeline_config.paths.timestamps_folder,
+            os.path.basename(audio_path).replace(
+                os.path.splitext(audio_path)[-1], "_timestamps.json"
+            ),
+        )
+        if not os.path.exists(timestamp_path):
+            sources_for_timestamps.append(audio_path)
+    # print(sources_for_timestamps)
+    logger.info(f"Sources to perform VAD on: {len(sources_for_timestamps)}")
+
+    perform_energy_vad(
+        audio_paths=sources_for_timestamps,
+        # frame_length=
+        # hop_length=
+        # energy_threshold=
+        # seconds_per_chunk=2000,
+        timestamps_folder=pipeline_config.paths.timestamps_folder,
+    )
+
+    logger.info(f"Loading transcriber model...")
 
     model = load_model(
-        USE_BATCHED_INFERENCE, MODEL_ID, DEVICE, COMPUTE_TYPE, NUM_WORKERS
+        pipeline_config.model_config.use_batched_inference,
+        pipeline_config.model_config.model_id,
+        pipeline_config.model_config.device,
+        pipeline_config.model_config.compute_type,
+        pipeline_config.model_config.num_workers,
     )
 
     logger.info(f"Model loaded.")
 
-    all_audio_paths = [
-        os.path.join(
-            AUDIO_FOLDER,
-            os.path.basename(video_path).replace(
-                os.path.splitext(video_path)[-1], ".wav"
-            ),
+    # map in a tuple the audio paths and the original full-video paths, to check if srts already exist during the loop.
+    # Match them intelligently, as the vocals_only folder might contain audio paths from different videos
+    sources_to_transcribe = []
+    for video_path in orig_video_paths:
+        related_audio_path = os.path.join(
+            pipeline_config.paths.vocals_only_folder,
+            os.path.splitext(os.path.basename(video_path))[0] + "_vocals.wav",
         )
-        for video_path in orig_video_paths
-    ]
+        related_timestamps_path = os.path.join(
+            pipeline_config.paths.timestamps_folder,
+            os.path.splitext(os.path.basename(related_audio_path))[0]
+            + "_timestamps.json",
+        )
+        logger.debug(
+            f"Related audio path: {related_audio_path}, related timestamps path: {related_timestamps_path}"
+        )
+        if os.path.exists(related_audio_path) and os.path.exists(
+            related_timestamps_path
+        ):
+            sources_to_transcribe.append(
+                (video_path, related_audio_path, related_timestamps_path)
+            )
+        else:
+            logger.warning(f"No audio or timestamps found for {video_path}")
 
-    logger.info(f"Starting transcription of subtitles...")
-    for audio_path in all_audio_paths:
-        logger.debug(f"Fetchable audio: {audio_path}...")
+    logger.info(f"Transcribing {len(sources_to_transcribe)} audio files...")
 
     segments: list[Segment]
     info: list[TranscriptionInfo]
-    for audio_path in all_audio_paths:
+    for original_video_path, audio_path, timestamp_path in sources_to_transcribe:
         try:
             logger.info(f"Transcribing {audio_path}...")
 
+            # if os.path.exists(
+
             # Load VAD timestamps for the current audio
-            vad_timestamps = load_vad_timestamps("./timestamps/vad_timestamps.json")
+            vad_timestamps = load_vad_timestamps(timestamp_path)
             audio_waveform, _ = load_audio(audio_path, torch.device("cpu"))
 
             if isinstance(audio_waveform, torch.Tensor):
@@ -148,31 +161,29 @@ def main():
                 audio_waveform=audio_waveform,
                 sample_rate=16000,
                 vad_timestamps=vad_timestamps,
-                beam_size=BEAM_SIZE,
-                language=LANGUAGE,
-                use_vad_filter=USE_VAD_FILTER,
-                patience=PATIENCE,
-                use_word_timestamps=USE_WORD_TIMESTAMPS,
-                vad_settings=VAD_SETTINGS,
-                log_progress=LOG_PROGRESS,
-                use_batched_inference=USE_BATCHED_INFERENCE,
-                batch_size=BATCH_SIZE,
+                beam_size=pipeline_config.model_config.beam_size,
+                language=pipeline_config.model_config.language,
+                use_vad_filter=pipeline_config.silero_vad_options.use_vad_filter,
+                patience=pipeline_config.model_config.patience,
+                use_word_timestamps=pipeline_config.model_config.use_word_timestamps,
+                vad_settings=pipeline_config.silero_vad_options.settings,
+                log_progress=pipeline_config.model_config.log_progress,
+                use_batched_inference=pipeline_config.model_config.use_batched_inference,
+                batch_size=pipeline_config.model_config.batch_size,
             )
 
             logger.info(f"Generating SRT for {audio_path}...")
             generate_srt(
                 segments=segments,
-                audio_path=audio_path,
-                max_chars=MAX_CHARS,
-                srt_debug_mode=SRT_DEBUG_MODE,
+                video_path=original_video_path,
+                max_chars=pipeline_config.transcription_config.max_chars,
+                srt_debug_mode=pipeline_config.transcription_config.debug_mode,
             )
 
         except Exception as e:
             logger.error(f"main::EXCEPTION::Error while transcribing {audio_path}: {e}")
-            if ATOMIC_TRANSCRIPTION:
-                return
 
-    logger.info(f"Done.")
+    logger.info(f"All transcriptions completed.")
 
 
 if __name__ == "__main__":
