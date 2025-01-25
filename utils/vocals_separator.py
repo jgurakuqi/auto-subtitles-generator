@@ -1,4 +1,5 @@
 import os
+from subprocess import run as subprocess_run
 import torch, torchaudio
 from preprocessing.vocals_separator import load_audio
 import gc
@@ -96,12 +97,14 @@ def separate_vocals(
     torch.cuda.empty_cache()
     gc.collect()
 
-    for _ in tqdm(range(int(num_iterations)), desc="Processing"):
+    for _ in tqdm(range(int(num_iterations)), desc="Separating audio chunk..."):
         chunk = mix[:, :, start:end]
 
         if chunk.shape[-1] > 0:
             with torch.no_grad():
-                with torch.autocast("cuda", dtype=torch.float16):
+                with torch.autocast(
+                    "cuda" if torch.cuda.is_available() else "cpu", dtype=torch.float16
+                ):
                     out = model.forward(chunk)
             out = fade(out)
             final[:, :, :, start:end] += out
@@ -135,11 +138,92 @@ def save_vocals(
     torchaudio.save(output_path, vocals.cpu(), sample_rate)
 
 
+# def extract_vocals_only_audio(
+#     input_audio_paths: list[str],
+#     segment: int = 11,
+#     overlap: float = 0.257,
+#     vocals_only_folder: str = "./vocals_only/",
+# ):
+#     """Extract vocals only audio from the input audio files.
+
+#     Args:
+#         input_audio_paths (list[str]): List of input audio file paths.
+#         segment (int, optional): Segment length in seconds. Defaults to 11.
+#         overlap (float, optional): Overlap between segments. Defaults to 0.257.
+#         vocals_only_folder (str, optional): Output folder for vocals only audio. Defaults to "./vocals_only".
+
+#     Returns:
+#         None
+#     """
+#     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#     model, sample_rate = load_vocals_model(device)
+
+#     create_folder_if_not_exists(vocals_only_folder)
+
+#     for input_path in input_audio_paths:
+#         output_audio_path = build_path(
+#             folder_path=vocals_only_folder,
+#             file_path=input_path,
+#             extension_replacement="_vocals.wav",
+#         )
+#         waveform, ref = load_audio(input_path, device)
+
+#         sources = separate_vocals(
+#             model, waveform[None], device=device, segment=segment, overlap=overlap
+#         )[0]
+
+#         del waveform
+#         torch.cuda.empty_cache()
+#         gc.collect()
+
+#         vocals = sources[model.sources.index("vocals")]
+#         save_vocals(vocals, ref, output_audio_path, sample_rate)
+
+
+def extract_audio_with_ffmpeg(input_path: str, output_path: str) -> str:
+    """
+    Extract audio from the input file using ffmpeg.
+
+    Args:
+        input_path (str): Path to the input media file
+        output_path (str): Path to save the extracted audio
+
+    Returns:
+        str: Path to the extracted audio file
+    """
+    try:
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        ffmpeg_command = [
+            "ffmpeg",
+            "-i",
+            input_path,
+            "-vn",  # Disable video output
+            "-acodec",
+            "pcm_s16le",  # Set audio codec to PCM (for WAV)
+            "-ar",
+            "41000",  # Set audio sample rate to 41kHz
+            output_path,
+        ]
+        result = subprocess_run(ffmpeg_command, capture_output=True, text=True)
+
+        if result.returncode != 0:
+            logger.error(f"FFmpeg error: {result.stderr}")
+            raise Exception(f"Failed to extract audio: {result.stderr}")
+
+        return output_path
+
+    except Exception as e:
+        logger.error(f"Error in extract_audio_with_ffmpeg: {e}")
+        raise
+
+
 def extract_vocals_only_audio(
     input_audio_paths: list[str],
     segment: int = 11,
     overlap: float = 0.257,
     vocals_only_folder: str = "./vocals_only/",
+    temp_audio_folder: str = "./temp_audio/",
 ):
     """Extract vocals only audio from the input audio files.
 
@@ -148,30 +232,58 @@ def extract_vocals_only_audio(
         segment (int, optional): Segment length in seconds. Defaults to 11.
         overlap (float, optional): Overlap between segments. Defaults to 0.257.
         vocals_only_folder (str, optional): Output folder for vocals only audio. Defaults to "./vocals_only".
+        temp_audio_folder (str, optional): Temporary folder for extracted audio. Defaults to "./temp_audio/".
 
     Returns:
         None
     """
+    if input_audio_paths is None or len(input_audio_paths) == 0:
+        logger.warning("No input audio files provided.")
+        return
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model, sample_rate = load_vocals_model(device)
 
     create_folder_if_not_exists(vocals_only_folder)
+    create_folder_if_not_exists(temp_audio_folder)
 
     for input_path in input_audio_paths:
+        # Create paths
+        temp_audio_path = build_path(
+            folder_path=temp_audio_folder,
+            file_path=input_path,
+            extension_replacement=".wav",
+        )
         output_audio_path = build_path(
             folder_path=vocals_only_folder,
             file_path=input_path,
             extension_replacement="_vocals.wav",
         )
-        waveform, ref = load_audio(input_path, device)
 
-        sources = separate_vocals(
-            model, waveform[None], device=device, segment=segment, overlap=overlap
-        )[0]
+        try:
+            # Extract audio with FFmpeg
+            extracted_audio_path = extract_audio_with_ffmpeg(
+                input_path, temp_audio_path
+            )
 
-        del waveform
-        torch.cuda.empty_cache()
-        gc.collect()
+            # Load extracted audio
+            waveform, ref = load_audio(extracted_audio_path, device)
 
-        vocals = sources[model.sources.index("vocals")]
-        save_vocals(vocals, ref, output_audio_path, sample_rate)
+            sources = separate_vocals(
+                model, waveform[None], device=device, segment=segment, overlap=overlap
+            )[0]
+
+            del waveform
+            if "cuda" in device.type:
+                torch.cuda.empty_cache()
+            gc.collect()
+
+            vocals = sources[model.sources.index("vocals")]
+            save_vocals(vocals, ref, output_audio_path, sample_rate)
+
+        except Exception as e:
+            logger.error(f"Failed to process {input_path}: {e}")
+
+        finally:
+            # Clean up temporary audio file
+            if os.path.exists(temp_audio_path):
+                os.remove(temp_audio_path)

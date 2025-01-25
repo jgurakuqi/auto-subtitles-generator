@@ -239,54 +239,70 @@ def save_timestamps_as_json(
 
 
 def perform_energy_vad(
-    audio_path: str,
+    audio_paths: list[str],
     frame_length: int = 1780,
     hop_length: int = 126,
     energy_threshold: float = 0.1,
     seconds_per_chunk: int = 2000,  # ~30 minutes
     timestamps_folder: str = "./timestamps/",
 ):
-    # audio_path = "./vocals_only.wav"
+    """Perform energy-based voice activity detection on audio files.
 
-    logger.debug(f"utils.energy_vad.perform_energy_vad:: Audio path: {audio_path}")
+    Args:
+        audio_paths (list[str]): List of audio file paths.
+        frame_length (int, optional): Frame length. Determines the sliding window size for energy calculation. Defaults to 1780.
+        hop_length (int, optional): Hop length. Determines the hop size for energy calculation (i.e., the stride). Defaults to 126.
+        energy_threshold (float, optional): Energy threshold. Used to determine voice activity. Defaults to 0.1.
+        seconds_per_chunk (int, optional): Seconds per chunk. Determines the size of each chunk to process.
+            Chunking reduces accuracy a little, but it's much faster with longer audios, and uses much less memory. Defaults to 2000.
+        timestamps_folder (str, optional): Folder to save timestamps. Defaults to "./timestamps/".
 
-    y: np.ndarray
-    sr: int
-    y, sr = cast(tuple[np.ndarray, int], load_audio(audio_path))
-    y_len = len(y)
-    hop_duration = hop_length / sr
-
-    audio_length_in_minutes = y_len / (sr * 60)
-    logger.debug(
-        f"utils.energy_vad.perform_energy_vad:: Audio length: {audio_length_in_minutes:.2f} minutes"
-    )
-
-    energy = calculate_energy_in_chunks(
-        y=y,
-        frame_length=frame_length,
-        hop_length=hop_length,
-        sample_rate=sr,
-        seconds_per_chunk=seconds_per_chunk,
-    )
-
-    voice_activity = detect_voice_activity(
-        energy=energy, energy_threshold=energy_threshold
-    )
-
-    timestamps = extract_timestamps(
-        voice_activity=voice_activity, hop_duration=hop_duration, y_length=y_len, sr=sr
-    )
-    new_timestamps = merge_contiguous_timestamps(timestamps=timestamps)
-
+    Returns:
+        None
+    """
     create_folder_if_not_exists(folder_path=timestamps_folder)
 
-    timestap_full_path = build_path(
-        folder_path=timestamps_folder,
-        file_path=audio_path,
-        extension_replacement="_timestamps.json",
-    )
+    for audio_path in audio_paths:
+        logger.debug(f"utils.energy_vad.perform_energy_vad:: Audio path: {audio_path}")
 
-    save_timestamps_as_json(
-        timestamps=new_timestamps,
-        file_path=timestap_full_path,
-    )
+        y: np.ndarray
+        sr: int
+        y, sr = cast(tuple[np.ndarray, int], load_audio(audio_path))
+        y_len = len(y)
+        hop_duration = hop_length / sr
+
+        audio_length_in_minutes = y_len / (sr * 60)
+        logger.debug(
+            f"utils.energy_vad.perform_energy_vad:: Audio length: {audio_length_in_minutes:.2f} minutes"
+        )
+
+        energy = calculate_energy_in_chunks(
+            y=y,
+            frame_length=frame_length,
+            hop_length=hop_length,
+            sample_rate=sr,
+            seconds_per_chunk=seconds_per_chunk,
+        )
+
+        voice_activity = detect_voice_activity(
+            energy=energy, energy_threshold=energy_threshold
+        )
+
+        timestamps = extract_timestamps(
+            voice_activity=voice_activity,
+            hop_duration=hop_duration,
+            y_length=y_len,
+            sr=sr,
+        )
+        new_timestamps = merge_contiguous_timestamps(timestamps=timestamps)
+
+        timestap_full_path = build_path(
+            folder_path=timestamps_folder,
+            file_path=audio_path,
+            extension_replacement="_timestamps.json",
+        )
+
+        save_timestamps_as_json(
+            timestamps=new_timestamps,
+            file_path=timestap_full_path,
+        )

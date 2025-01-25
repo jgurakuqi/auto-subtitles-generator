@@ -1,6 +1,8 @@
 paths:
-  videos_folder: "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/2_Chunin Exams/"
+  # videos_folder: "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/2_Chunin Exams/"
+  videos_folder: "./"
   vocals_only_folder : "./vocals_only/"
+  timestamps_folder: "./timestamps/"
 
 vocal_separator_model:
   use_half_precision: true # tells Demucs to use half precision float16.
@@ -13,7 +15,7 @@ vocal_separator_model:
 transcriber_model:
   model_id: "deepdml/faster-whisper-large-v3-turbo-ct2"
   # device: "cuda" # This will be dynamically determined in code if not enabled here.
-  compute_type: "float16"
+  compute_type: "int8" # for GPU "int8_float16" #"float16"
   beam_size: 8
   patience: 1.25
   language: "en"

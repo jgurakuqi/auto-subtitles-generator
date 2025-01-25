@@ -1,0 +1,338 @@
+--------------------------------------------------------
+RAW:
+Word:  Hello,, Start: 0.0, End: 1.0, Prob: 0.9173521995544434
+Word:  I, Start: 1.38, End: 1.44, Prob: 0.9888984560966492
+Word:  am, Start: 1.44, End: 1.52, Prob: 0.26809436082839966
+Word:  Jurgen, Start: 1.52, End: 1.78, Prob: 0.546412318944931
+Word:  Guracucci, Start: 1.78, End: 2.34, Prob: 0.8599144816398621
+Word:  and, Start: 2.34, End: 2.86, Prob: 0.6792277097702026
+Word:  I, Start: 2.86, End: 2.96, Prob: 0.9491627216339111
+Word:  am, Start: 2.96, End: 3.06, Prob: 0.9537623524665833
+Word:  excited, Start: 3.06, End: 3.48, Prob: 0.975923478603363
+Word:  to, Start: 3.48, End: 3.7, Prob: 0.9972652196884155
+Word:  apply, Start: 3.7, End: 3.96, Prob: 0.9969998002052307
+Word:  for, Start: 3.96, End: 4.56, Prob: 0.9710837602615356
+Word:  the, Start: 4.56, End: 4.74, Prob: 0.983636200428009
+Word:  machine, Start: 4.74, End: 5.04, Prob: 0.46424540877342224
+Word:  learning, Start: 5.04, End: 5.36, Prob: 0.9659738540649414
+Word:  engineer, Start: 5.36, End: 5.86, Prob: 0.9502711892127991
+Word:  role, Start: 5.86, End: 6.3, Prob: 0.9716729521751404
+Word:  at, Start: 6.3, End: 6.5, Prob: 0.9888323545455933
+Word:  Creator., Start: 6.5, End: 6.82, Prob: 0.4018086791038513
+NORMALIZED:
+Word:  Hello,, Start: 0.0, End: 1.0
+Word:  I, Start: 1.38, End: 1.44
+Word:  am, Start: 1.44, End: 1.52
+Word:  Jurgen, Start: 1.52, End: 1.78
+Word:  Guracucci, Start: 1.78, End: 2.34
+Word:  and, Start: 2.34, End: 2.86
+Word:  I, Start: 2.86, End: 2.96
+Word:  am, Start: 2.96, End: 3.06
+Word:  excited, Start: 3.06, End: 3.48
+Word:  to, Start: 3.48, End: 3.7
+Word:  apply, Start: 3.7, End: 3.96
+Word:  for, Start: 3.96, End: 4.56
+Word:  the, Start: 4.56, End: 4.74
+Word:  machine, Start: 4.74, End: 5.04
+Word:  learning, Start: 5.04, End: 5.36
+Word:  engineer, Start: 5.36, End: 5.86
+Word:  role, Start: 5.86, End: 6.3
+Word:  at, Start: 6.3, End: 6.5
+Word:  Creator., Start: 6.5, End: 6.82
+
+RAW:
+Word:  With, Start: 7.44, End: 8.02, Prob: 0.9923766851425171
+Word:  a, Start: 8.02, End: 8.1, Prob: 0.968269407749176
+Word:  master's, Start: 8.1, End: 8.54, Prob: 0.6688072234392166
+Word:  degree, Start: 8.54, End: 8.72, Prob: 0.9958117008209229
+Word:  in, Start: 8.72, End: 8.84, Prob: 0.9967811107635498
+Word:  artificial, Start: 8.84, End: 9.12, Prob: 0.6829834580421448
+Word:  intelligence, Start: 9.12, End: 9.96, Prob: 0.9969366788864136
+Word:  and, Start: 9.96, End: 10.46, Prob: 0.9752508997917175
+Word:  data, Start: 10.46, End: 10.64, Prob: 0.9811675548553467
+Word:  engineering, Start: 10.64, End: 11.2, Prob: 0.9967564940452576
+Word:  and, Start: 11.2, End: 11.76, Prob: 0.7889347672462463
+Word:  extensive, Start: 11.76, End: 12.14, Prob: 0.9885575771331787
+Word:  experience, Start: 12.14, End: 12.62, Prob: 0.9954618811607361
+Word:  in, Start: 12.62, End: 12.82, Prob: 0.9918069243431091
+Word:  developing, Start: 12.82, End: 13.18, Prob: 0.9977167844772339
+Word:  AI, Start: 13.18, End: 13.54, Prob: 0.9206994771957397
+Word: -driven, Start: 13.54, End: 13.86, Prob: 0.6263004541397095
+Word:  solutions,, Start: 13.86, End: 14.34, Prob: 0.9966545104980469
+NORMALIZED:
+Word:  With, Start: 7.44, End: 8.02
+Word:  a, Start: 8.02, End: 8.1
+Word:  master's, Start: 8.1, End: 8.54
+Word:  degree, Start: 8.54, End: 8.72
+Word:  in, Start: 8.72, End: 8.84
+Word:  artificial, Start: 8.84, End: 9.12
+Word:  intelligence, Start: 9.12, End: 9.96
+Word:  and, Start: 9.96, End: 10.46
+Word:  data, Start: 10.46, End: 10.64
+Word:  engineering, Start: 10.64, End: 11.2
+Word:  and, Start: 11.2, End: 11.76
+Word:  extensive, Start: 11.76, End: 12.14
+Word:  experience, Start: 12.14, End: 12.62
+Word:  in, Start: 12.62, End: 12.82
+Word:  developing, Start: 12.82, End: 13.18
+Word:  AI, Start: 13.18, End: 13.54
+Word: -driven, Start: 13.54, End: 13.86
+Word:  solutions,, Start: 13.86, End: 14.34
+
+RAW:
+Word:  I, Start: 14.66, End: 15.14, Prob: 0.9952591061592102
+Word:  am, Start: 15.14, End: 15.24, Prob: 0.9920122027397156
+Word:  well, Start: 15.24, End: 15.44, Prob: 0.9982162117958069
+Word:  prepared, Start: 15.44, End: 15.88, Prob: 0.8710646033287048
+Word:  to, Start: 15.88, End: 16.12, Prob: 0.9987719655036926
+Word:  spearhead, Start: 16.12, End: 16.84, Prob: 0.9803138673305511
+Word:  Creator's, Start: 16.84, End: 17.64, Prob: 0.9028870165348053
+Word:  machine, Start: 17.64, End: 17.96, Prob: 0.9340469241142273
+Word:  learning, Start: 17.96, End: 18.26, Prob: 0.975127100944519
+Word:  initiatives., Start: 18.26, End: 18.82, Prob: 0.9954955577850342
+NORMALIZED:
+Word:  I, Start: 14.66, End: 15.14
+Word:  am, Start: 15.14, End: 15.24
+Word:  well, Start: 15.24, End: 15.44
+Word:  prepared, Start: 15.44, End: 15.88
+Word:  to, Start: 15.88, End: 16.12
+Word:  spearhead, Start: 16.12, End: 16.84
+Word:  Creator's, Start: 16.84, End: 17.64
+Word:  machine, Start: 17.64, End: 17.96
+Word:  learning, Start: 17.96, End: 18.26
+Word:  initiatives., Start: 18.26, End: 18.82
+
+RAW:
+Word:  At, Start: 19.38, End: 20.0, Prob: 0.9954082369804382
+Word:  Reply,, Start: 20.0, End: 20.44, Prob: 0.8492192625999451
+Word:  I, Start: 20.72, End: 20.78, Prob: 0.9966417551040649
+Word:  have, Start: 20.78, End: 20.88, Prob: 0.956173300743103
+Word:  successfully, Start: 20.88, End: 21.5, Prob: 0.9962761402130127
+Word:  developed, Start: 21.5, End: 22.22, Prob: 0.9615539312362671
+Word:  and, Start: 22.22, End: 22.58, Prob: 0.9943026304244995
+Word:  deployed, Start: 22.58, End: 23.02, Prob: 0.9972568154335022
+Word:  generative, Start: 23.02, End: 23.64, Prob: 0.9273306727409363
+Word:  AI, Start: 23.64, End: 23.96, Prob: 0.9965621829032898
+Word:  and, Start: 23.96, End: 24.26, Prob: 0.980426549911499
+Word:  NLP, Start: 24.26, End: 24.64, Prob: 0.9973197281360626
+Word:  models,, Start: 24.64, End: 25.16, Prob: 0.9971799850463867
+NORMALIZED:
+Word:  At, Start: 19.38, End: 20.0
+Word:  Reply,, Start: 20.0, End: 20.44
+Word:  I, Start: 20.72, End: 20.78
+Word:  have, Start: 20.78, End: 20.88
+Word:  successfully, Start: 20.88, End: 21.5
+Word:  developed, Start: 21.5, End: 22.22
+Word:  and, Start: 22.22, End: 22.58
+Word:  deployed, Start: 22.58, End: 23.02
+Word:  generative, Start: 23.02, End: 23.64
+Word:  AI, Start: 23.64, End: 23.96
+Word:  and, Start: 23.96, End: 24.26
+Word:  NLP, Start: 24.26, End: 24.64
+Word:  models,, Start: 24.64, End: 25.16
+
+RAW:
+Word:  aligning, Start: 25.32, End: 25.7, Prob: 0.9923718273639679
+Word:  closely, Start: 25.7, End: 26.06, Prob: 0.9968018531799316
+Word:  with, Start: 26.06, End: 26.28, Prob: 0.9993116855621338
+Word:  Creator's, Start: 26.28, End: 26.76, Prob: 0.9930517375469208
+Word:  focus, Start: 26.76, End: 27.06, Prob: 0.9965829253196716
+Word:  on, Start: 27.06, End: 27.36, Prob: 0.9972921013832092
+Word:  AI, Start: 27.36, End: 27.66, Prob: 0.9891958236694336
+Word: -driven, Start: 27.66, End: 28.06, Prob: 0.9900829195976257
+Word:  content, Start: 28.06, End: 28.36, Prob: 0.9958836436271667
+Word:  marketing., Start: 28.36, End: 28.94, Prob: 0.9987506866455078
+NORMALIZED:
+Word:  aligning, Start: 25.32, End: 25.7
+Word:  closely, Start: 25.7, End: 26.06
+Word:  with, Start: 26.06, End: 26.28
+Word:  Creator's, Start: 26.28, End: 26.76
+Word:  focus, Start: 26.76, End: 27.06
+Word:  on, Start: 27.06, End: 27.36
+Word:  AI, Start: 27.36, End: 27.66
+Word: -driven, Start: 27.66, End: 28.06
+Word:  content, Start: 28.06, End: 28.36
+Word:  marketing., Start: 28.36, End: 28.94
+
+RAW:
+Word:  My, Start: 28.94, End: 30.08, Prob: 0.8767152428627014
+Word:  proficiency, Start: 30.08, End: 30.56, Prob: 0.9810167849063873
+Word:  in, Start: 30.56, End: 30.8, Prob: 0.9976401329040527
+Word:  Python,, Start: 30.8, End: 31.24, Prob: 0.9228500127792358
+Word:  PyTorch, Start: 31.44, End: 31.94, Prob: 0.939962163567543
+Word:  and, Start: 31.94, End: 32.08, Prob: 0.659727156162262
+Word:  SeekitLearn,, Start: 32.08, End: 32.72, Prob: 0.5811047166585922
+Word:  along, Start: 32.8, End: 33.08, Prob: 0.9936324954032898
+Word:  with, Start: 33.08, End: 33.32, Prob: 0.9987123012542725
+Word:  experience, Start: 33.32, End: 33.78, Prob: 0.8784270882606506
+Word:  in, Start: 33.78, End: 34.02, Prob: 0.9932897686958313
+Word:  cloud, Start: 34.02, End: 34.24, Prob: 0.8666142225265503
+Word:  platforms, Start: 34.24, End: 34.84, Prob: 0.9464093446731567
+Word:  and, Start: 34.84, End: 35.12, Prob: 0.9713005423545837
+Word:  other, Start: 35.12, End: 35.48, Prob: 0.9812129139900208
+Word:  technologies,, Start: 35.48, End: 36.18, Prob: 0.9914858937263489
+NORMALIZED:
+Word:  My, Start: 28.94, End: 30.08
+Word:  proficiency, Start: 30.08, End: 30.56
+Word:  in, Start: 30.56, End: 30.8
+Word:  Python,, Start: 30.8, End: 31.24
+Word:  PyTorch, Start: 31.44, End: 31.94
+Word:  and, Start: 31.94, End: 32.08
+Word:  SeekitLearn,, Start: 32.08, End: 32.72
+Word:  along, Start: 32.8, End: 33.08
+Word:  with, Start: 33.08, End: 33.32
+Word:  experience, Start: 33.32, End: 33.78
+Word:  in, Start: 33.78, End: 34.02
+Word:  cloud, Start: 34.02, End: 34.24
+Word:  platforms, Start: 34.24, End: 34.84
+Word:  and, Start: 34.84, End: 35.12
+Word:  other, Start: 35.12, End: 35.48
+Word:  technologies,, Start: 35.48, End: 36.18
+
+RAW:
+Word:  equipped, Start: 36.7, End: 37.1, Prob: 0.6862200498580933
+Word:  me, Start: 37.1, End: 37.26, Prob: 0.997581958770752
+Word:  to, Start: 37.26, End: 37.42, Prob: 0.9983534812927246
+Word:  design, Start: 37.42, End: 37.82, Prob: 0.9983878135681152
+Word:  and, Start: 37.82, End: 38.14, Prob: 0.9889820218086243
+Word:  optimize, Start: 38.14, End: 38.48, Prob: 0.8906501531600952
+Word:  cutting, Start: 38.48, End: 39.02, Prob: 0.9945797920227051
+Word: -edge, Start: 39.02, End: 39.3, Prob: 0.8863281309604645
+Word:  machine, Start: 39.3, End: 39.62, Prob: 0.9563961625099182
+Word:  learning, Start: 39.62, End: 39.94, Prob: 0.949209988117218
+Word:  models., Start: 39.94, End: 40.42, Prob: 0.9945808053016663
+NORMALIZED:
+Word:  equipped, Start: 36.7, End: 37.1
+Word:  me, Start: 37.1, End: 37.26
+Word:  to, Start: 37.26, End: 37.42
+Word:  design, Start: 37.42, End: 37.82
+Word:  and, Start: 37.82, End: 38.14
+Word:  optimize, Start: 38.14, End: 38.48
+Word:  cutting, Start: 38.48, End: 39.02
+Word: -edge, Start: 39.02, End: 39.3
+Word:  machine, Start: 39.3, End: 39.62
+Word:  learning, Start: 39.62, End: 39.94
+Word:  models., Start: 39.94, End: 40.42
+
+RAW:
+Word:  I, Start: 40.8, End: 41.48, Prob: 0.9963648915290833
+Word:  have, Start: 41.48, End: 41.6, Prob: 0.9953403472900391
+Word:  a, Start: 41.6, End: 41.74, Prob: 0.9797242879867554
+Word:  proven, Start: 41.74, End: 42.0, Prob: 0.997292697429657
+Word:  track, Start: 42.0, End: 42.22, Prob: 0.4536121189594269
+Word:  record, Start: 42.22, End: 42.78, Prob: 0.9812003970146179
+Word:  of, Start: 42.78, End: 43.1, Prob: 0.9861867427825928
+Word:  leading, Start: 43.1, End: 43.42, Prob: 0.9981163740158081
+Word:  projects, Start: 43.42, End: 44.08, Prob: 0.9939714074134827
+Word:  and, Start: 44.08, End: 44.26, Prob: 0.986760139465332
+Word:  collaborating, Start: 44.26, End: 44.76, Prob: 0.9968875050544739
+Word:  with, Start: 44.76, End: 45.0, Prob: 0.99883633852005
+Word:  cross, Start: 45.0, End: 45.3, Prob: 0.9917524456977844
+Word: -functional, Start: 45.3, End: 45.8, Prob: 0.9894012411435446
+Word:  teams,, Start: 45.8, End: 46.1, Prob: 0.9975404739379883
+NORMALIZED:
+Word:  I, Start: 40.8, End: 41.48
+Word:  have, Start: 41.48, End: 41.6
+Word:  a, Start: 41.6, End: 41.74
+Word:  proven, Start: 41.74, End: 42.0
+Word:  track, Start: 42.0, End: 42.22
+Word:  record, Start: 42.22, End: 42.78
+Word:  of, Start: 42.78, End: 43.1
+Word:  leading, Start: 43.1, End: 43.42
+Word:  projects, Start: 43.42, End: 44.08
+Word:  and, Start: 44.08, End: 44.26
+Word:  collaborating, Start: 44.26, End: 44.76
+Word:  with, Start: 44.76, End: 45.0
+Word:  cross, Start: 45.0, End: 45.3
+Word: -functional, Start: 45.3, End: 45.8
+Word:  teams,, Start: 45.8, End: 46.1
+
+RAW:
+Word:  ensuring, Start: 46.44, End: 46.84, Prob: 0.9938127994537354
+Word:  that, Start: 46.84, End: 47.06, Prob: 0.9154654741287231
+Word:  solutions, Start: 47.06, End: 47.42, Prob: 0.9882128834724426
+Word:  are, Start: 47.42, End: 47.68, Prob: 0.9990480542182922
+Word:  innovative, Start: 47.68, End: 48.16, Prob: 0.9967958331108093
+Word:  and, Start: 48.16, End: 48.56, Prob: 0.9790660738945007
+Word:  meet, Start: 48.56, End: 49.16, Prob: 0.9939124584197998
+Word:  customer, Start: 49.16, End: 49.56, Prob: 0.9226019382476807
+Word:  needs., Start: 49.56, End: 50.0, Prob: 0.9925073981285095
+NORMALIZED:
+Word:  ensuring, Start: 46.44, End: 46.84
+Word:  that, Start: 46.84, End: 47.06
+Word:  solutions, Start: 47.06, End: 47.42
+Word:  are, Start: 47.42, End: 47.68
+Word:  innovative, Start: 47.68, End: 48.16
+Word:  and, Start: 48.16, End: 48.56
+Word:  meet, Start: 48.56, End: 49.16
+Word:  customer, Start: 49.16, End: 49.56
+Word:  needs., Start: 49.56, End: 50.0
+
+RAW:
+Word:  My, Start: 50.42, End: 51.08, Prob: 0.9922674298286438
+Word:  strong, Start: 51.08, End: 51.36, Prob: 0.9962114095687866
+Word:  communication, Start: 51.36, End: 51.8, Prob: 0.9799571633338928
+Word:  skills, Start: 51.8, End: 52.34, Prob: 0.9977195858955383
+Word:  enable, Start: 52.34, End: 52.84, Prob: 0.5757191777229309
+Word:  me, Start: 52.84, End: 53.06, Prob: 0.9986706972122192
+Word:  to, Start: 53.06, End: 53.2, Prob: 0.9985285997390747
+Word:  convey, Start: 53.2, End: 53.54, Prob: 0.9587776064872742
+Word:  complex, Start: 53.54, End: 53.92, Prob: 0.9747810363769531
+Word:  systems,, Start: 53.92, End: 53.98, Prob: 0.02493956871330738
+NORMALIZED:
+Word:  My, Start: 50.42, End: 51.08
+Word:  strong, Start: 51.08, End: 51.36
+Word:  communication, Start: 51.36, End: 51.8
+Word:  skills, Start: 51.8, End: 52.34
+Word:  enable, Start: 52.34, End: 52.84
+Word:  me, Start: 52.84, End: 53.06
+Word:  to, Start: 53.06, End: 53.2
+Word:  convey, Start: 53.2, End: 53.54
+Word:  complex, Start: 53.54, End: 53.92
+Word:  systems,, Start: 53.92, End: 53.98
+
+RAW:
+Word:  making, Start: 0.0, End: 0.9, Prob: 0.7642764449119568
+Word:  me, Start: 0.9, End: 1.12, Prob: 0.9975131750106812
+Word:  a, Start: 1.12, End: 1.26, Prob: 0.9903185367584229
+Word:  valuable, Start: 1.26, End: 1.48, Prob: 0.9947997331619263
+Word:  asset, Start: 1.48, End: 1.9, Prob: 0.9927557110786438
+Word:  to, Start: 1.9, End: 2.14, Prob: 0.9976847171783447
+Word:  Creator's, Start: 2.14, End: 2.78, Prob: 0.48735807090997696
+Word:  global, Start: 2.78, End: 2.96, Prob: 0.7840481400489807
+Word:  team., Start: 2.96, End: 3.36, Prob: 0.5215159058570862
+Word:  I, Start: 4.16, End: 4.66, Prob: 0.9840549826622009
+Word:  am, Start: 4.66, End: 4.76, Prob: 0.4916437864303589
+Word:  excited, Start: 4.76, End: 5.1, Prob: 0.9862667322158813
+Word:  about, Start: 5.1, End: 5.36, Prob: 0.994143545627594
+Word:  the, Start: 5.36, End: 5.5, Prob: 0.9970331192016602
+Word:  prospect, Start: 5.5, End: 5.84, Prob: 0.98139488697052
+Word:  of, Start: 5.84, End: 6.06, Prob: 0.9977816939353943
+Word:  contributing, Start: 6.06, End: 6.62, Prob: 0.990802526473999
+Word:  to, Start: 6.62, End: 6.86, Prob: 0.9951564073562622
+Word:  Creator's, Start: 6.86, End: 6.98, Prob: 0.7857717871665955
+Word:  global, Start: 6.98, End: 6.98, Prob: 0.6516590118408203
+Word:  team., Start: 6.98, End: 6.98, Prob: 0.9537298083305359
+NORMALIZED:
+Word:  making, Start: 0.0, End: 0.9
+Word:  me, Start: 0.9, End: 1.12
+Word:  a, Start: 1.12, End: 1.26
+Word:  valuable, Start: 1.26, End: 1.48
+Word:  asset, Start: 1.48, End: 1.9
+Word:  to, Start: 1.9, End: 2.14
+Word:  Creator's, Start: 2.14, End: 2.78
+Word:  global, Start: 2.78, End: 2.96
+Word:  team., Start: 2.96, End: 3.36
+Word:  I, Start: 4.16, End: 4.66
+Word:  am, Start: 4.66, End: 4.76
+Word:  excited, Start: 4.76, End: 5.1
+Word:  about, Start: 5.1, End: 5.36
+Word:  the, Start: 5.36, End: 5.5
+Word:  prospect, Start: 5.5, End: 5.84
+Word:  of, Start: 5.84, End: 6.06
+Word:  contributing, Start: 6.06, End: 6.62
+Word:  to, Start: 6.62, End: 6.86
+Word:  Creator's, Start: 6.86, End: 6.98
+Word:  global, Start: 6.98, End: 6.98
+Word:  team., Start: 6.98, End: 6.98
+

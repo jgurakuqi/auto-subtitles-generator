@@ -20,7 +20,7 @@ def adjust_outlier_times(words: list[Word]) -> list[Word]:
 
 def generate_srt(
     segments: Iterable[Segment],
-    audio_path: str,
+    video_path: str,
     max_chars: int,
     srt_debug_mode: bool,
     srt_debug_path: str = "./raw_result.txt",
@@ -30,7 +30,7 @@ def generate_srt(
 
     Args:
         segments (list[Segment]): List of segments.
-        audio_path (str): Path to the audio file.
+        video_path (str): Path to the original video file. Used to generate the output file path.
         max_chars (int): Maximum number of characters per line.
         srt_debug_mode (bool): Debug mode.
         srt_debug_path (str, optional): Debug file path. Defaults to "./raw_result.txt".
@@ -38,7 +38,7 @@ def generate_srt(
     Returns:
         None
     """
-    srt_filename = os.path.splitext(audio_path)[0] + ".srt"
+    srt_filename = video_path.replace(os.path.splitext(video_path)[-1], ".srt")
     with open(srt_filename, "w") as srt_file:
         index = 1
         words: list[Word] | None
