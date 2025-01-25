@@ -96,7 +96,7 @@ def main():
     model = load_model(
         pipeline_config.model_config.use_batched_inference,
         pipeline_config.model_config.model_id,
-        pipeline_config.model_config.device,
+        pipeline_config.model_config.device.type,
         pipeline_config.model_config.compute_type,
         pipeline_config.model_config.num_workers,
     )
