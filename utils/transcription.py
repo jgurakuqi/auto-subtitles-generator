@@ -82,7 +82,7 @@ def load_model(
     else:
         return load_linear_whisper(
             model_id=model_id,
-            device="cpu",
+            device=device,
             compute_type=compute_type,
             num_workers=1,
         )
