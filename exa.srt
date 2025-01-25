@@ -1,0 +1,104 @@
+1
+00:00:00,000 --> 00:00:03,700
+Hello,  I  am  Jurgen  Guracucci  and  I  am  excited  to
+
+2
+00:00:03,700 --> 00:00:06,500
+apply  for  the  machine  learning  engineer  role  at
+
+3
+00:00:06,500 --> 00:00:06,820
+Creator.
+
+4
+00:00:07,440 --> 00:00:09,960
+With  a  master's  degree  in  artificial  intelligence
+
+5
+00:00:09,960 --> 00:00:12,820
+and  data  engineering  and  extensive  experience  in
+
+6
+00:00:12,820 --> 00:00:14,339
+developing  AI -driven  solutions,
+
+7
+00:00:14,660 --> 00:00:17,960
+I  am  well  prepared  to  spearhead  Creator's  machine
+
+8
+00:00:17,960 --> 00:00:18,820
+learning  initiatives.
+
+9
+00:00:19,379 --> 00:00:22,579
+At  Reply,  I  have  successfully  developed  and
+
+10
+00:00:22,579 --> 00:00:25,160
+deployed  generative  AI  and  NLP  models,
+
+11
+00:00:25,320 --> 00:00:28,059
+aligning  closely  with  Creator's  focus  on  AI -driven
+
+12
+00:00:28,059 --> 00:00:28,940
+content  marketing.
+
+13
+00:00:28,940 --> 00:00:32,799
+My  proficiency  in  Python,  PyTorch  and  SeekitLearn,
+
+14
+00:00:32,799 --> 00:00:35,479
+along  with  experience  in  cloud  platforms  and  other
+
+15
+00:00:35,479 --> 00:00:36,179
+technologies,
+
+16
+00:00:36,700 --> 00:00:39,299
+equipped  me  to  design  and  optimize  cutting -edge
+
+17
+00:00:39,299 --> 00:00:40,420
+machine  learning  models.
+
+18
+00:00:40,799 --> 00:00:44,079
+I  have  a  proven  track  record  of  leading  projects
+
+19
+00:00:44,079 --> 00:00:46,100
+and  collaborating  with  cross -functional  teams,
+
+20
+00:00:46,439 --> 00:00:49,159
+ensuring  that  solutions  are  innovative  and  meet
+
+21
+00:00:49,159 --> 00:00:50,000
+customer  needs.
+
+22
+00:00:50,420 --> 00:00:53,539
+My  strong  communication  skills  enable  me  to  convey
+
+23
+00:00:53,539 --> 00:00:53,979
+complex  systems,
+
+24
+00:00:00,000 --> 00:00:02,960
+making  me  a  valuable  asset  to  Creator's  global
+
+25
+00:00:02,960 --> 00:00:06,059
+team.  I  am  excited  about  the  prospect  of
+
+26
+00:00:06,059 --> 00:00:06,980
+contributing  to  Creator's  global  team.
+
