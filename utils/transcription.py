@@ -218,10 +218,11 @@ def transcribe_speech_segments(
     info: TranscriptionInfo
     speech_segment: np.ndarray
 
-    for speech_segment in tqdm(
-        speech_segments,
+    for i, speech_segment in tqdm(
+        enumerate(speech_segments),
         total=len(speech_segments),
         desc="Transcribing speech segments: ",
+        leave=False,
     ):
 
         segments, info = transcribe_audio(
@@ -240,7 +241,68 @@ def transcribe_speech_segments(
 
         for segment in segments:
             all_segments.append(segment)
+            if segment and segment.words:
+                for word in segment.words:
+                    word.start += vad_timestamps[i][0]
+                    word.end += vad_timestamps[i][0]
 
         all_info.append(info)
 
     return all_segments, all_info
+
+
+# def transcribe_speech_segments(
+#     model: BatchedInferencePipeline | WhisperModel,
+#     audio_waveform: np.ndarray,
+#     sample_rate: int,
+#     vad_timestamps: list[tuple[float, float]],
+#     beam_size: int,
+#     language: str,
+#     use_vad_filter: bool,
+#     patience: float,
+#     use_word_timestamps: bool,
+#     vad_settings: dict | None,
+#     log_progress: bool,
+#     use_batched_inference: bool,
+#     batch_size: int,
+# ):
+#     speech_segments = slice_audio(audio_waveform, sample_rate, vad_timestamps)
+#     all_segments = []
+#     all_info = []
+
+#     for i, speech_segment in enumerate(speech_segments):
+#         # Get the original VAD timestamp for this segment
+#         original_start_time = vad_timestamps[i][0]
+
+#         segments, info = transcribe_audio(
+#             model=model,
+#             audio=speech_segment,
+#             beam_size=beam_size,
+#             language=language,
+#             use_vad_filter=use_vad_filter,
+#             batch_size=batch_size,
+#             patience=patience,
+#             use_word_timestamps=use_word_timestamps,
+#             vad_settings=vad_settings,
+#             use_batched_inference=use_batched_inference,
+#             log_progress=log_progress,
+#         )
+
+#         # Adjust segment timestamps relative to original audio
+#         adjusted_segments = [
+#             Segment(
+#                 **(
+#                     segment._asdict()
+#                     | {
+#                         "start": segment.start + original_start_time,
+#                         "end": segment.end + original_start_time,
+#                     }
+#                 )
+#             )
+#             for segment in segments
+#         ]
+
+#         all_segments.extend(adjusted_segments)
+#         all_info.append(info)
+
+#     return all_segments, all_info

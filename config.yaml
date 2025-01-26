@@ -1,6 +1,6 @@
 paths:
   # videos_folder: "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/2_Chunin Exams/"
-  videos_folder: "./"
+  videos_folder: "./test_videos/"
   vocals_only_folder : "./vocals_only/"
   timestamps_folder: "./timestamps/"
 
@@ -19,7 +19,7 @@ transcriber_model:
   beam_size: 8
   patience: 1.25
   language: "en"
-  log_progress: true
+  log_progress: false
   use_word_timestamps: true
   use_batched_inference: false
   batched_inference_params:

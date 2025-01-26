@@ -102,9 +102,7 @@ def separate_vocals(
 
         if chunk.shape[-1] > 0:
             with torch.no_grad():
-                with torch.autocast(
-                    "cuda" if torch.cuda.is_available() else "cpu", dtype=torch.float16
-                ):
+                with torch.autocast(device_type=device.type, dtype=torch.float16):
                     out = model.forward(chunk)
             out = fade(out)
             final[:, :, :, start:end] += out

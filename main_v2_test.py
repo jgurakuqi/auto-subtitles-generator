@@ -3,6 +3,7 @@ import logging, torch, os
 from typing import Any
 import numpy as np
 import librosa
+from tqdm import tqdm
 
 # Local repository imports
 from utils.audio_extraction import extract_audio
@@ -70,6 +71,8 @@ def main():
     # 4. Generate SRT files
 
     sources_for_timestamps = []
+    FORCE_VAD = True
+
     for audio_path in vocals_only_audio_paths:
         timestamp_path = os.path.join(
             pipeline_config.paths.timestamps_folder,
@@ -77,7 +80,7 @@ def main():
                 os.path.splitext(audio_path)[-1], "_timestamps.json"
             ),
         )
-        if not os.path.exists(timestamp_path):
+        if not os.path.exists(timestamp_path) or FORCE_VAD:
             sources_for_timestamps.append(audio_path)
     # print(sources_for_timestamps)
     logger.info(f"Sources to perform VAD on: {len(sources_for_timestamps)}")
@@ -92,6 +95,8 @@ def main():
     )
 
     logger.info(f"Loading transcriber model...")
+
+    return
 
     model = load_model(
         pipeline_config.model_config.use_batched_inference,
@@ -132,7 +137,11 @@ def main():
 
     segments: list[Segment]
     info: list[TranscriptionInfo]
-    for original_video_path, audio_path, timestamp_path in sources_to_transcribe:
+    for original_video_path, audio_path, timestamp_path in tqdm(
+        sources_to_transcribe,
+        total=len(sources_to_transcribe),
+        desc="Transcribing audio files...",
+    ):
         try:
             logger.info(f"Transcribing {audio_path}...")
 
