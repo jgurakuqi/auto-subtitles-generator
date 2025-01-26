@@ -349,10 +349,10 @@ def save_timestamps_as_json(
 
 
 def main():
-    audio_path = "./vocals_only.wav"
-    frame_length = 1780  # Original : 2048
-    hop_length = 126  # Original : 512
-    energy_threshold = 0.1
+    audio_path = "./vocals_only/test_1_vocals.wav"
+    frame_length = 512  # Original : 2048
+    hop_length = 128  # Original : 512
+    energy_threshold = 0.025
 
     print(f"Audio path: {audio_path}")
 
@@ -377,7 +377,7 @@ def main():
         frame_length=frame_length,
         hop_length=hop_length,
         sample_rate=sr,
-        seconds_per_chunk=2000,  # 1024 = ~17 minutes, 1562 = ~21 minutes, 2000 = ~30 minutes
+        seconds_per_chunk=64,  # 2000, 1024 = ~17 minutes, 1562 = ~21 minutes, 2000 = ~30 minutes
     )
 
     voice_activity = detect_voice_activity(
@@ -389,8 +389,8 @@ def main():
     )
     new_timestamps = merge_contiguous_timestamps(timestamps=timestamps)
 
-    timestamps_folder = "./timestamps/"
-    create_folder_if_not_exists(folder_path=timestamps_folder)
+    # timestamps_folder = "./timestamps/"
+    # create_folder_if_not_exists(folder_path=timestamps_folder)
     # save_timestamps(
     #     timestamps=new_timestamps,
     #     file_path=os.path.join(timestamps_folder, "energy_concat.txt"),
@@ -404,8 +404,7 @@ def main():
     #     energy=energy,
     # )
     save_timestamps_as_json(
-        timestamps=new_timestamps,
-        file_path=os.path.join(timestamps_folder, "vad_timestamps.json"),
+        timestamps=new_timestamps, file_path="./NEW_ENERGY_RESULTS.json"
     )
 
     time2 = datetime.now()
