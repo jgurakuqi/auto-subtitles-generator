@@ -1,7 +1,9 @@
 from datetime import datetime
 import json
+import os
 from pydub import AudioSegment
 import numpy as np
+from utils.utils import create_folder_if_not_exists
 
 
 def calculate_decibel_levels_with_timestamps(
@@ -178,44 +180,52 @@ def write_timestamp_intervals_to_file(
         json.dump(intervals, f, indent=4)
 
 
-from utils.utils import create_folder_if_not_exists
+def perform_decibel_vad(
+    audio_paths: list[str],
+    store_debug_files: bool = False,
+    decibels_threshold: float = 47.5,
+    segment_length_ms: int = 25,
+    timestamps_folder: str = "./timestamps/",
+):
 
+    for audio_file_path in audio_paths:
 
-def main():
-    audio_file_path = "./vocals_only/test_1_vocals.wav"
-    debug_pre_discard = "./VAD_DECIBEL_TEST/vad_decibel_debug_pre_discard.txt"
-    output_decibel_path = "./VAD_DECIBEL_TEST/vad_decibel_debug.txt"
-    output_timestamps_path = "./VAD_DECIBEL_TEST/vad_timestamp_intervals.txt"
+        create_folder_if_not_exists(timestamps_folder)
 
-    create_folder_if_not_exists("./VAD_DECIBEL_TEST")
+        decibels_by_timestamps = calculate_decibel_levels_with_timestamps(
+            audio_file_path=audio_file_path,
+            decibels_threshold=decibels_threshold,
+            segment_length_ms=segment_length_ms,
+        )
 
-    DECIBELS_THRESHOLD = 47.5
-    SEGMENT_LENGTH_MS = 25
+        if store_debug_files:
+            debug_pre_discard = os.path.join(
+                timestamps_folder,
+                audio_file_path.replace(".wav", "_debug_pre_discard.txt"),
+            )
+            write_decibel_and_timestamps_to_file(
+                decibels_by_timestamps=decibels_by_timestamps,
+                file_path=debug_pre_discard,
+            )
 
-    decibels_by_timestamps = calculate_decibel_levels_with_timestamps(
-        audio_file_path=audio_file_path,
-        decibels_threshold=DECIBELS_THRESHOLD,
-        segment_length_ms=SEGMENT_LENGTH_MS,
-    )
+        discard_short_silences(
+            decibels_by_timestamps=decibels_by_timestamps,
+            min_silence_duration_in_seconds=0.7,
+        )
 
-    write_decibel_and_timestamps_to_file(
-        decibels_by_timestamps=decibels_by_timestamps,
-        file_path=debug_pre_discard,
-    )
+        if store_debug_files:
+            debug_post_discard = os.path.join(
+                timestamps_folder,
+                audio_file_path.replace(".wav", "_debug_post_discard.txt"),
+            )
+            write_decibel_and_timestamps_to_file(
+                decibels_by_timestamps=decibels_by_timestamps,
+                file_path=debug_post_discard,
+            )
 
-    discard_short_silences(
-        decibels_by_timestamps=decibels_by_timestamps,
-        min_silence_duration_in_seconds=0.7,
-    )
-
-    write_decibel_and_timestamps_to_file(
-        decibels_by_timestamps=decibels_by_timestamps,
-        file_path=output_decibel_path,
-    )
-
-    intervals = find_intervals_without_silence(decibels_by_timestamps)
-    write_timestamp_intervals_to_file(intervals, output_timestamps_path)
-
-
-if __name__ == "__main__":
-    main()
+        output_timestamps_path = os.path.join(
+            timestamps_folder,
+            audio_file_path.replace(".wav", "_timestamps.json"),
+        )
+        intervals = find_intervals_without_silence(decibels_by_timestamps)
+        write_timestamp_intervals_to_file(intervals, output_timestamps_path)
