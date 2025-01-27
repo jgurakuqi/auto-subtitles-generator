@@ -15,6 +15,7 @@ from utils.utils import (
 )
 from utils.vocals_separator import extract_vocals_only_audio, load_audio
 from utils.energy_vad import perform_energy_vad, load_vad_timestamps
+from utils.decibel_vad import perform_decibel_vad
 from pipeline_config.pipeline_config import PipelineConfig
 
 
@@ -85,12 +86,16 @@ def main():
     # print(sources_for_timestamps)
     logger.info(f"Sources to perform VAD on: {len(sources_for_timestamps)}")
 
-    perform_energy_vad(
+    # perform_energy_vad(
+    #     audio_paths=sources_for_timestamps,
+    #     # frame_length=
+    #     # hop_length=
+    #     # energy_threshold=
+    #     # seconds_per_chunk=2000,
+    #     timestamps_folder=pipeline_config.paths.timestamps_folder,
+    # )
+    perform_decibel_vad(
         audio_paths=sources_for_timestamps,
-        # frame_length=
-        # hop_length=
-        # energy_threshold=
-        # seconds_per_chunk=2000,
         timestamps_folder=pipeline_config.paths.timestamps_folder,
     )
 

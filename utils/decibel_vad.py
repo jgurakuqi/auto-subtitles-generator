@@ -201,7 +201,9 @@ def perform_decibel_vad(
         if store_debug_files:
             debug_pre_discard = os.path.join(
                 timestamps_folder,
-                audio_file_path.replace(".wav", "_debug_pre_discard.txt"),
+                os.path.basename(audio_file_path).replace(
+                    ".wav", "_debug_pre_discard.txt"
+                ),
             )
             write_decibel_and_timestamps_to_file(
                 decibels_by_timestamps=decibels_by_timestamps,
@@ -216,7 +218,9 @@ def perform_decibel_vad(
         if store_debug_files:
             debug_post_discard = os.path.join(
                 timestamps_folder,
-                audio_file_path.replace(".wav", "_debug_post_discard.txt"),
+                os.path.basename(audio_file_path).replace(
+                    ".wav", "_debug_post_discard.txt"
+                ),
             )
             write_decibel_and_timestamps_to_file(
                 decibels_by_timestamps=decibels_by_timestamps,
@@ -225,7 +229,7 @@ def perform_decibel_vad(
 
         output_timestamps_path = os.path.join(
             timestamps_folder,
-            audio_file_path.replace(".wav", "_timestamps.json"),
+            os.path.basename(audio_file_path).replace(".wav", "_timestamps.json"),
         )
         intervals = find_intervals_without_silence(decibels_by_timestamps)
         write_timestamp_intervals_to_file(intervals, output_timestamps_path)
