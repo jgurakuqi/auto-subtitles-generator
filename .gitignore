@@ -1,9 +1,5 @@
-﻿alternatives
-utils/__pycache__
-old
-__pycache__
-full_pipeline.py
-DEBUG/*
-.vscode
-logs
-audio_output
+﻿__pycache__
+debug_full_result
+align_model
+model
+old/*
