@@ -13,6 +13,7 @@ import torch, torchaudio
 from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
 from torchaudio.transforms import Fade
 from tqdm import tqdm
+from configs.pipeline_config import PipelineConfig
 from utils.utils import create_folder_if_not_exists, build_path, cuda_force_collect
 
 # import logging
@@ -166,17 +167,14 @@ def __separate_vocals(
 
 def extract_vocals_only_audio(
     videos_paths: list[str],
-    segment: int = 11,
-    overlap: float = 0.257,
-    vocals_only_folder: str = "./vocals_only/",
+    pipeline_config: PipelineConfig,
 ):
     """Extract vocals only audio from the input audio files.
 
     Args:
         videos_paths (list[str]): The paths to the videos.
-        segment (int, optional): The segment length in seconds. Defaults to 11.
-        overlap (float, optional): The overlap between segments in seconds. Defaults to 0.257.
-        vocals_only_folder (str, optional): The folder to save the vocals only audio. Defaults to "./vocals_only/".
+        pipeline_config (PipelineConfig): The configuration for the pipeline.
+
     Returns:
         None
     """
@@ -190,7 +188,7 @@ def extract_vocals_only_audio(
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model, sample_rate = load_vocals_model(device)
 
-    create_folder_if_not_exists(vocals_only_folder)
+    create_folder_if_not_exists(pipeline_config.tmp_numpy_audio_folder)
 
     resampler = torchaudio.transforms.Resample(
         orig_freq=sample_rate, new_freq=16_000
@@ -207,7 +205,11 @@ def extract_vocals_only_audio(
             waveform, _ = __convert_waveform_from_np_to_torch(waveform_numpy, device)
 
             sources = __separate_vocals(
-                model, waveform[None], device=device, segment=segment, overlap=overlap
+                model,
+                waveform[None],
+                device=device,
+                segment=pipeline_config.vocal_separator_config.segment,
+                overlap=pipeline_config.vocal_separator_config.overlap,
             )[0]
 
             del waveform, waveform_numpy
@@ -224,7 +226,7 @@ def extract_vocals_only_audio(
             vocals_resampled_numpy = vocals_mono.cpu().numpy().flatten()
 
             vocals_only_path = build_path(
-                folder_path=vocals_only_folder,
+                folder_path=pipeline_config.tmp_numpy_audio_folder,
                 file_path=video_path,
                 extension_replacement=".npy",
             )

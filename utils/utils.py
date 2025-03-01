@@ -8,8 +8,55 @@ from os.path import (
     dirname as os_path_dirname,
 )
 from shutil import rmtree as shutil_rmtree
+from time import sleep
 from torch.cuda import empty_cache as torch_empty_cache
 from gc import collect as gc_collect
+
+
+def filter_video_sources(
+    sources_paths: list[str], supported_video_extensions: list[str]
+) -> list[str]:
+    """
+    Filter a list of video sources based on their extensions.
+
+    Args:
+        sources_paths (list[str]): The list of video sources to filter.
+        supported_video_extensions (list[str]): The list of supported video extensions.
+
+    Returns:
+        list[str]: The filtered list of video sources.
+    """
+    return [
+        source_path
+        for source_path in sources_paths
+        if any(
+            source_path.lower().endswith(extension)
+            for extension in supported_video_extensions
+        )
+    ]
+
+
+def filter_video_sources_by_filenames(
+    sources_paths: list[str], files_to_process: list[str]
+) -> None:
+    """
+    Filter a list of video sources based on their filenames.
+
+    Args:
+        sources_paths (list[str]): The list of video sources to filter.
+        files_to_process (list[str]): The list of filenames to process.
+    """
+    if files_to_process:
+        sources_paths = [
+            source_path
+            for source_path in sources_paths
+            if any(
+                file_to_process.lower() in source_path.lower()
+                for file_to_process in files_to_process
+            )
+        ]
+    else:
+        return sources_paths
 
 
 def get_path_without_file(file_path: str) -> str:
@@ -149,7 +196,7 @@ def read_json(input_path: str) -> dict | list[dict]:
     return data
 
 
-def cuda_force_collect(iterations: int = 2) -> None:
+def cuda_force_collect(iterations: int = 2, sleep_time: float = 0.0) -> None:
     """
     Collect garbage and empty the CUDA cache multiple times.
 
@@ -159,3 +206,5 @@ def cuda_force_collect(iterations: int = 2) -> None:
     for _ in range(iterations):
         gc_collect()
         torch_empty_cache()
+        if sleep_time > 0.0:
+            sleep(sleep_time)

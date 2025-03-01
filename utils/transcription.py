@@ -1,15 +1,14 @@
 # Std libs
 from tqdm import tqdm
-import os
-
+from os.path import basename as os_path_basename, join as os_path_join
 from numpy import load as np_load
 
 
 # 3rd party libs
+from configs.pipeline_config import PipelineConfig
 from whisperx import load_model as whisperx_load_model
 
 # Local libs
-from configs.whisper_config import WhisperConfig
 from utils.utils import (
     store_json,
     cuda_force_collect,
@@ -19,20 +18,26 @@ from utils.utils import (
 
 
 def transcribe_audios(
-    whisper_config: WhisperConfig,
     audio_paths: list[str],
-    tmp_transcripts_folder: str,
-    tmp_np_audio_folder: str,
+    pipeline_config: PipelineConfig,
     enable_debug_prints: bool,
-) -> list[str]:
+) -> None:
+    """
+    Transcribe a list of audio files using Whisperx.
+
+    Args:
+        audio_paths (list[str]): A list of audio file paths.
+        pipeline_config (PipelineConfig): The configuration for the pipeline.
+        enable_debug_prints (bool): Enable debug prints.
+    """
 
     print("--- Loading whisper model ---")
     model = whisperx_load_model(
-        whisper_arch=whisper_config.model_id,
-        device=whisper_config.device,
-        compute_type=whisper_config.compute_type,
-        download_root=whisper_config.download_root,
-        language=whisper_config.language,
+        whisper_arch=pipeline_config.whisper_config.model_id,
+        device=pipeline_config.whisper_config.device,
+        compute_type=pipeline_config.whisper_config.compute_type,
+        download_root=pipeline_config.whisper_config.download_root,
+        language=pipeline_config.whisper_config.language,
     )
 
     print("--- Transcribing audios ---")
@@ -43,11 +48,11 @@ def transcribe_audios(
         if enable_debug_prints:
             print(
                 "utils.transcriptor.transcribe_audios:: Processing audio: ",
-                os.path.basename(audio_path),
+                os_path_basename(audio_path),
             )
 
         numpy_path = build_path(
-            folder_path=tmp_np_audio_folder,
+            folder_path=pipeline_config.tmp_numpy_audio_folder,
             file_path=audio_path,
             extension_replacement=".npy",
         )
@@ -58,22 +63,22 @@ def transcribe_audios(
         except:
             print(
                 "utils.transcriptor.transcribe_audios:: ERROR: Failed to load audio: ",
-                os.path.basename(audio_path),
+                os_path_basename(audio_path),
             )
             continue
 
         result = model.transcribe(
             audio,
-            batch_size=whisper_config.batch_size,
-            language=whisper_config.language,
+            batch_size=pipeline_config.whisper_config.batch_size,
+            language=pipeline_config.whisper_config.language,
         )
 
         audio = None
 
         # Saving the audio and the transcript
-        # numpy_path = os.path.join( tmp_np_audio_folder, get_filename_with_new_extension(audio_path, "npy"), )
-        intermediate_result_path = os.path.join(
-            tmp_transcripts_folder,
+        # numpy_path = os_path_join( tmp_np_audio_folder, get_filename_with_new_extension(audio_path, "npy"), )
+        intermediate_result_path = os_path_join(
+            pipeline_config.tmp_intermediate_result_folder,
             get_filename_with_new_extension(audio_path, "json"),
         )
 
@@ -81,7 +86,7 @@ def transcribe_audios(
         store_json(data=result, output_path=intermediate_result_path)
 
         result = None
-        cuda_force_collect()
+        cuda_force_collect(iterations=1)
 
     model = None
-    cuda_force_collect()
+    cuda_force_collect(iterations=3, sleep_time=0.2)

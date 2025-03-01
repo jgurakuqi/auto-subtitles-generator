@@ -1,11 +1,13 @@
 # Project Title
 Subtitle Generation with Faster Whisper
 
+
 # Description
 This project utilizes HDemucs and WhisperX to generate subtitles from audio files. The pipeline is divided into three steps: 
 1. Audio extraction using ffmpeg.
 2. Audio separation using HDemucs
 3. Subtitle generation using WhisperX (Speech-to-text + Alignment).
+The main goal of this project is to provide a simple and efficient way to generate subtitles from audio files, also allowing future users to extend or replace the current steps of the pipeline.
 
 
 # Table of Contents
@@ -17,50 +19,29 @@ This project utilizes HDemucs and WhisperX to generate subtitles from audio file
 * [Contributing](#contributing)
 * [License](#license)
 
+
 # Installation
-
-## Prerequisites
-- Python 3.x
-- ffmpeg installed on your system
-- WhisperX requirements 
+Follow the instructions on WhisperX [installation's page](https://github.com/m-bain/whisperX) for installing the required dependencies.
 
 
-
-## Steps - WIP
-1. Clone the repository:
-
+# Usage
+The library is still WIP, so the usage will be updated continuously.
+The current way to run the pipeline is to run the main.py file, which will run the pipeline.py module for handling all the steps.
 ```bash
-git clone https://github.com/jgurakuqi/auto-subtitles-generator
-cd auto-subtitles-generator
+python main.py
 ```
 
-<!-- 2. Install the required Python packages:
-```bash
-pip install -r requirements.txt
-``` -->
-
-2. Ensure ffmpeg is installed and accessible from the command line. You can download it from [FFmpeg's official website](https://www.ffmpeg.org/download.html).
-
-3. Follow the requirements for WhisperX.
-
-## Usage - WIP
-
 # Planned Improvements:
-
+- Complete the lib API and config:
+    - A YAML config file is WIP: there will be stored all the default parameters.
+    - The API will be in the main.py file, allowing to run the pipeline thorugh:
+        - CLI.
+        - Python import (PIP install).
+        - Docker.
 - Update WhisperX to match new CTranslate and Torch, for easier setup.
-- Make the library accessible through:
-    - Python import (PIP install)
-    - CLI
-    - Docker
+- Make the library more modular, configurable and extensible, allowing new users to replace or extend the current steps of the pipeline.
+- Develop and tune a new model for direct subtitle generation, capable of handling complex and long audios even in presence of background effects or silences, without relying on external tools such as VADs or vocals separation.
 
-
-# Contributing
-- ## Work in progress
-
-<!-- ```bash	
-# Print the list of currently installed packages
-pip freeze
-``` -->
 
 # License
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.

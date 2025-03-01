@@ -1,21 +1,27 @@
+# Std libs
 from datetime import timedelta as datetime_timedelta
 from os.path import join as os_path_join, basename as os_path_basename
-from utils.utils import get_filename_with_new_extension, get_path_without_file
 from numpy import load as np_load
 from tqdm import tqdm
+
+# 3rd party libs
 from whisperx import (
     load_align_model as whisperx_load_align_model,
     align as whisperx_align,
 )
 
-from configs.aligner_config import AlignerConfing
+# Local libs
 from utils.utils import (
+    cuda_force_collect,
     read_json,
     get_filename_with_new_extension,
     store_json,
     create_folder_if_not_exists,
     build_path,
+    get_filename_with_new_extension,
+    get_path_without_file,
 )
+from configs.pipeline_config import PipelineConfig
 
 
 def __format_time(seconds):
@@ -364,25 +370,23 @@ def __create_srt(segments: list[dict], audio_path: str):
 
 def generate_aligned_subtitles(
     audio_paths: list[str],
-    tmp_numpy_audio_folder: str,
-    tmp_intermediate_result_folder: str,
-    align_model_config: AlignerConfing,
+    pipeline_config: PipelineConfig,
     debug_full_result_storage: bool = False,
 ):
     model_a, metadata = whisperx_load_align_model(
         language_code="en",
-        device=align_model_config.device,
-        model_dir=align_model_config.model_dir,
+        device=pipeline_config.aligner_config.device,
+        model_dir=pipeline_config.aligner_config.model_dir,
     )
     for audio_path in tqdm(
         audio_paths, total=len(audio_paths), desc="Generating aligned subtitles..."
     ):
         numpy_path = os_path_join(
-            tmp_numpy_audio_folder,
+            pipeline_config.tmp_numpy_audio_folder,
             get_filename_with_new_extension(audio_path, "npy"),
         )
         intermediate_result_path = os_path_join(
-            tmp_intermediate_result_folder,
+            pipeline_config.tmp_intermediate_result_folder,
             get_filename_with_new_extension(audio_path, "json"),
         )
 
@@ -412,9 +416,9 @@ def generate_aligned_subtitles(
             model=model_a,
             align_model_metadata=metadata,
             audio=audio,
-            device=align_model_config.device,
+            device=pipeline_config.aligner_config.device,
             return_char_alignments=False,
-            print_progress=align_model_config.print_progress,
+            print_progress=pipeline_config.aligner_config.print_progress,
         )
 
         if debug_full_result_storage:
@@ -443,3 +447,5 @@ def generate_aligned_subtitles(
                 for curr_segment in result["segments"]
             ],
         )
+
+        cuda_force_collect(iterations=1)
