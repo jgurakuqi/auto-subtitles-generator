@@ -1,13 +1,12 @@
 # Std libs
-import torch
 from tqdm import tqdm
 import os
 
-from numpy import save as np_save, load as np_load
+from numpy import load as np_load
 
 
 # 3rd party libs
-import whisperx
+from whisperx import load_model as whisperx_load_model
 
 # Local libs
 from configs.whisper_config import WhisperConfig
@@ -17,7 +16,6 @@ from utils.utils import (
     get_filename_with_new_extension,
     build_path,
 )
-from utils.audio import extract_vocals_only_audio
 
 
 def transcribe_audios(
@@ -29,7 +27,7 @@ def transcribe_audios(
 ) -> list[str]:
 
     print("--- Loading whisper model ---")
-    model = whisperx.load_model(
+    model = whisperx_load_model(
         whisper_arch=whisper_config.model_id,
         device=whisper_config.device,
         compute_type=whisper_config.compute_type,
@@ -57,7 +55,6 @@ def transcribe_audios(
         try:
             # audio = whisperx.load_audio(audio_path)
             audio = np_load(numpy_path)
-
         except:
             print(
                 "utils.transcriptor.transcribe_audios:: ERROR: Failed to load audio: ",
@@ -71,6 +68,8 @@ def transcribe_audios(
             language=whisper_config.language,
         )
 
+        audio = None
+
         # Saving the audio and the transcript
         # numpy_path = os.path.join( tmp_np_audio_folder, get_filename_with_new_extension(audio_path, "npy"), )
         intermediate_result_path = os.path.join(
@@ -81,6 +80,7 @@ def transcribe_audios(
         # np_save( file=numpy_path, arr=audio, )
         store_json(data=result, output_path=intermediate_result_path)
 
+        result = None
         cuda_force_collect()
 
     model = None
