@@ -1,30 +1,30 @@
-import json
-import os
-import shutil
-from time import sleep
+from json import dump as json_dump, load as json_load
+from os import walk as os_walk, makedirs as os_makedirs
+from os.path import (
+    join as os_path_join,
+    basename as os_path_basename,
+    splitext as os_path_splitext,
+    exists as os_path_exists,
+    dirname as os_path_dirname,
+)
+from shutil import rmtree as shutil_rmtree
 from torch.cuda import empty_cache as torch_empty_cache
 from gc import collect as gc_collect
-import os
-
-import os
 
 
-def get_path_without_file(file_path):
+def get_path_without_file(file_path: str) -> str:
     """
     Gets the path of a file up to the file excluded.
 
     Args:
-        file_path: The full path to the file.
+        file_path (str): The full path to the file.
 
     Returns:
-        The path without the filename, or an empty string if the input is invalid or just a filename.
-        Returns the directory even if it doesn't exist.
+        str: The path without the filename, or an empty string if the input is invalid or just a filename.
     """
     if not file_path:
         return ""
-
-    directory = os.path.dirname(file_path)
-
+    directory = os_path_dirname(file_path)
     return directory
 
 
@@ -46,14 +46,14 @@ def build_path(
     if extension_replacement is not None:
         if "." not in extension_replacement:
             extension_replacement = "." + extension_replacement
-        built_path = os.path.join(
+        built_path = os_path_join(
             folder_path,
-            os.path.basename(file_path).replace(
-                os.path.splitext(file_path)[-1], extension_replacement
+            os_path_basename(file_path).replace(
+                os_path_splitext(file_path)[-1], extension_replacement
             ),
         )
     else:
-        built_path = os.path.join(folder_path, os.path.basename(file_path))
+        built_path = os_path_join(folder_path, os_path_basename(file_path))
     return built_path
 
 
@@ -70,8 +70,8 @@ def get_filename_with_new_extension(filepath: str, new_extension: str) -> str | 
         Returns None if the input filepath is invalid or doesn't have an extension.
     """
     try:
-        full_filename = os.path.basename(filepath)
-        filename, extension = os.path.splitext(full_filename)
+        full_filename = os_path_basename(filepath)
+        filename, extension = os_path_splitext(full_filename)
 
         if not extension:
             return None
@@ -83,38 +83,79 @@ def get_filename_with_new_extension(filepath: str, new_extension: str) -> str | 
         return None
 
 
-def read_all_paths_recursively(path):
+def read_all_paths_recursively(path: str) -> list[str]:
+    """
+    Recursively reads all paths in a directory.
+
+    Args:
+        path (str): The path to the directory.
+
+    Returns:
+        list[str]: A list of all the paths in the directory.
+    """
     paths = []
-    for root, _, filenames in os.walk(path):
+    for root, _, filenames in os_walk(path):
         for filename in filenames:
-            paths.append(os.path.join(root, filename))
+            paths.append(os_path_join(root, filename))
     return paths
 
 
-def create_folder_if_not_exists(folder_path):
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+def create_folder_if_not_exists(folder_path: str) -> None:
+    """
+    Creates a folder if it doesn't exist.
+
+    Args:
+        folder_path (str): The path to the folder.
+    """
+    if not os_path_exists(folder_path):
+        os_makedirs(folder_path)
 
 
 def delete_folder_if_exists(folder_path: str) -> None:
-    if os.path.exists(folder_path):
-        shutil.rmtree(folder_path, ignore_errors=True)
+    """
+    Deletes a folder if it exists.
+
+    Args:
+        folder_path (str): The path to the folder.
+    """
+    if os_path_exists(folder_path):
+        shutil_rmtree(folder_path, ignore_errors=True)
 
 
-def store_json(data, output_path):
+def store_json(data: dict, output_path: str) -> None:
+    """
+    Store a dictionary as a json file.
+
+    Args:
+        data (dict): The dictionary to store.
+        output_path (str): The path to the output file.
+    """
     with open(output_path, "w") as f:
-        json.dump(data, f, indent=4)
+        json_dump(data, f, indent=4)
 
 
-def read_json(input_path):
+def read_json(input_path: str) -> dict | list[dict]:
+    """
+    Read a json file.
+
+    Args:
+        input_path (str): The path to the input file.
+
+    Returns:
+        dict: The dictionary/list of dictionaries read from the file.
+    """
     with open(input_path, "r") as f:
-        data = json.load(f)
+        data = json_load(f)
     return data
 
 
-def cuda_force_collect(iterations=3):
+def cuda_force_collect(iterations: int = 2) -> None:
+    """
+    Collect garbage and empty the CUDA cache multiple times.
+
+    Args:
+        iterations (int, optional): The number of times to collect garbage and empty the CUDA cache. Defaults to 2.
+    """
     for _ in range(iterations):
         gc_collect()
         torch_empty_cache()
-        gc_collect()
-        sleep(0.5)

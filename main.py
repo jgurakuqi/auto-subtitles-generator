@@ -6,12 +6,7 @@ from pipeline import pipeline
 if __name__ == "__main__":
     device = "cuda"  # or "cpu"
     language = "en"  # or any language supported by Faster-Whisper
-    # input_folder_path = "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/"
-    # input_folder_path = (
-    #     "/mnt/c/Users/jgura/Downloads/NaruCannon/Dub/8_Akatsuki Supression Mission/"
-    # )
-    # input_folder_path = r"/mnt/c/Users/jgura/Desktop/NARUTO/"
-    input_folder_path = r"/mnt/c/Users/jgura/Desktop/NARUTO/14_"
+    input_folder_path = r"/mnt/c/Users/jgura/Desktop/NARUTO/15_"
     files_to_process = []  # ["Kakashi vs. Itachi"]
     # files_to_process = ["The Ultimate Art"]
 
