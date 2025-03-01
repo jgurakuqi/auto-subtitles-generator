@@ -9,9 +9,7 @@ from subprocess import (
     run as subprocess_run,
     CalledProcessError as subprocess_CalledProcessError,
 )
-from subprocess import run as subprocess_run
 import torch, torchaudio
-import gc
 from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
 from torchaudio.transforms import Fade
 from tqdm import tqdm
@@ -21,7 +19,7 @@ from utils.utils import create_folder_if_not_exists, build_path, cuda_force_coll
 # logger = logging.getLogger("auto-sub-gen")
 
 
-def load_audio(file: str, sr: int, volume_factor: float = 1.36) -> np_ndarray:
+def load_audio(file: str, sr: int, volume_factor: float = 1.6) -> np_ndarray:
     """
     Open an audio file and read as mono waveform, with an option to increase volume.
 
@@ -136,8 +134,8 @@ def __separate_vocals(
     final = torch.zeros(batch, len(model.sources), channels, length, device=device)
 
     num_iterations = (length - overlap_frames) // (chunk_len - overlap_frames) + 1
-    torch.cuda.empty_cache()
-    gc.collect()
+
+    cuda_force_collect(iterations=1)
 
     for _ in tqdm(
         range(int(num_iterations)),
@@ -161,25 +159,9 @@ def __separate_vocals(
         end += chunk_len
         if end >= length:
             fade.fade_out_len = 0
+
+    fade = None
     return final
-
-
-def __save_vocals(
-    vocals: torch.Tensor, ref: torch.Tensor, output_path: str, sample_rate: int
-) -> None:
-    """Save the extracted vocals to a file.
-
-    Args:
-        vocals (torch.Tensor): The vocals to save.
-        ref (torch.Tensor): The reference signal.
-        output_path (str): The path to save the vocals.
-        sample_rate (int): The sample rate of the audio.
-
-    Returns:
-        None
-    """
-    vocals = vocals * ref.std() + ref.mean()
-    torchaudio.save(output_path, vocals.cpu(), sample_rate)
 
 
 def extract_vocals_only_audio(
@@ -275,11 +257,6 @@ def extract_vocals_only_audio(
             # logger.error(f"Failed to process {video_path}: {e}")
             print(f"Failed to process {video_path}: {e}")
 
-    try:
-        del model
-        del device
-    except:
-        pass
-    finally:
-        print("VOCALS EXTRACTION COMPLETED")
-        cuda_force_collect()
+    model, device, resampler = None, None, None
+    print("VOCALS EXTRACTION COMPLETED")
+    cuda_force_collect()
